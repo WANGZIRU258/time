@@ -132,6 +132,11 @@
       position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
       font-size: 9px; color: #C8B0B0; letter-spacing: 2px;
     }
+    .welcome-progress {
+      position: absolute; bottom: 0; left: 0; height: 2px;
+      background: linear-gradient(90deg, var(--pink), var(--peach));
+      width: 0%; transition: width 0.3s ease;
+    }
 
     /* ========== Main ========== */
     .main-content { opacity: 0; transition: opacity 0.7s ease 0.4s; }
@@ -504,7 +509,8 @@
       <div class="welcome-sub" id="welcomeSub" style="opacity:0">Our Love Story</div>
       <button class="welcome-btn" id="welcomeBtn">点击进入</button>
     </div>
-    <div class="welcome-hint">请佩戴耳机获得最佳体验</div>
+    <div class="welcome-hint" id="welcomeHint">音乐加载中...</div>
+    <div class="welcome-progress" id="welcomeProgress"></div>
   </div>
 
   <!-- Main -->
@@ -600,6 +606,37 @@
 
   <script>
     var START_DATE = new Date('2025-10-21');
+
+    // Audio loading progress
+    (function () {
+      var audio = document.getElementById('bgMusic');
+      var bar = document.getElementById('welcomeProgress');
+      var hint = document.getElementById('welcomeHint');
+      var loaded = false;
+
+      function updateProgress() {
+        if (audio.buffered.length > 0) {
+          var pct = (audio.buffered.end(audio.buffered.length - 1) / audio.duration) * 100;
+          bar.style.width = pct + '%';
+          if (pct >= 100 && !loaded) {
+            loaded = true;
+            hint.textContent = '请佩戴耳机获得最佳体验';
+          }
+        }
+      }
+
+      audio.addEventListener('progress', updateProgress);
+      audio.addEventListener('loadeddata', function () {
+        bar.style.width = '100%';
+        loaded = true;
+        hint.textContent = '请佩戴耳机获得最佳体验';
+      });
+      audio.addEventListener('canplay', function () {
+        bar.style.width = '100%';
+        loaded = true;
+        hint.textContent = '请佩戴耳机获得最佳体验';
+      });
+    })();
 
     // Welcome photo converge - photos fly from edges to center and vanish
     (function () {
