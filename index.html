@@ -51,57 +51,92 @@
     }
     .welcome.hide { opacity: 0; transform: scale(1.03); pointer-events: none; }
 
-    /* Photo vortex */
-    .welcome-vortex {
+    /* Photo tunnel */
+    .welcome-tunnel {
       position: absolute; inset: 0; z-index: 0;
       display: flex; align-items: center; justify-content: center;
       overflow: hidden; pointer-events: none;
-      perspective: 900px;
+      perspective: 600px;
     }
 
-    .vortex-stage {
-      position: relative;
-      width: 300px; height: 300px;
-      transform-style: preserve-3d;
-    }
-
-    .vortex-ring {
-      position: absolute; inset: 0;
-      transform-style: preserve-3d;
-    }
-
-    .vortex-ring.spin1 { animation: ringRotate 18s linear infinite; }
-    .vortex-ring.spin2 { animation: ringRotate 25s linear infinite reverse; }
-    .vortex-ring.spin3 { animation: ringRotate 32s linear infinite; }
-
-    @keyframes ringRotate {
-      from { transform: rotateY(0deg); }
-      to { transform: rotateY(360deg); }
-    }
-
-    .vortex-card {
+    .tunnel-item {
       position: absolute;
-      top: 50%; left: 50%;
-      width: 100px; height: 70px;
-      margin: -35px 0 0 -50px;
-      border-radius: 8px; overflow: hidden;
-      background: rgba(240,232,228,0.8);
-      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
-      backface-visibility: hidden;
+      width: 200px; height: 140px;
+      border-radius: 10px; overflow: hidden;
+      background: rgba(240,232,228,0.9);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      animation: tunnelFly linear infinite;
+      opacity: 0;
     }
-    .vortex-card img { width: 100%; height: 100%; object-fit: cover; }
-    .vortex-card-ph {
+    .tunnel-item img { width: 100%; height: 100%; object-fit: cover; }
+    .tunnel-item-ph {
       width: 100%; height: 100%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; color: #D4C0B8;
+      font-size: 20px; color: #D4C0B8;
     }
 
-    /* Center glow */
-    .vortex-glow {
-      position: absolute;
-      width: 200px; height: 200px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(212,115,139,0.08) 0%, transparent 70%);
-      pointer-events: none; z-index: 1;
+    @keyframes tunnelFly {
+      0% {
+        transform: translateZ(200px) scale(1.8);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.7;
+      }
+      80% {
+        opacity: 0.3;
+      }
+      100% {
+        transform: translateZ(-1200px) scale(0.1);
+        opacity: 0;
+      }
+    }
+
+    /* Slight vertical drift */
+    .tunnel-item:nth-child(odd) {
+      animation-name: tunnelFlyDrift;
+    }
+    @keyframes tunnelFlyDrift {
+      0% {
+        transform: translateZ(200px) scale(1.8) translateY(0px);
+        opacity: 0;
+      }
+      10% { opacity: 0.65; }
+      50% {
+        transform: translateZ(-400px) scale(0.6) translateY(-30px);
+        opacity: 0.35;
+      }
+      80% { opacity: 0.15; }
+      100% {
+        transform: translateZ(-1200px) scale(0.1) translateY(10px);
+        opacity: 0;
+      }
+    }
+
+    .tunnel-item:nth-child(even) {
+      animation-name: tunnelFlyDrift2;
+    }
+    @keyframes tunnelFlyDrift2 {
+      0% {
+        transform: translateZ(200px) scale(1.8) translateY(0px);
+        opacity: 0;
+      }
+      10% { opacity: 0.65; }
+      50% {
+        transform: translateZ(-400px) scale(0.6) translateY(25px);
+        opacity: 0.35;
+      }
+      80% { opacity: 0.15; }
+      100% {
+        transform: translateZ(-1200px) scale(0.1) translateY(-15px);
+        opacity: 0;
+      }
+    }
+
+    /* Vignette overlay for depth */
+    .welcome-vignette {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 30%, rgba(255,250,247,0.6) 100%);
     }
 
     .welcome-content { position: relative; z-index: 3; text-align: center; }
@@ -514,11 +549,9 @@
 
   <!-- Welcome -->
   <div class="welcome" id="welcome">
-    <!-- Photo vortex -->
-    <div class="welcome-vortex" id="vortex">
-      <div class="vortex-stage" id="vortexStage"></div>
-      <div class="vortex-glow"></div>
-    </div>
+    <!-- Photo tunnel -->
+    <div class="welcome-tunnel" id="tunnel"></div>
+    <div class="welcome-vignette"></div>
 
     <div class="welcome-content">
       <div class="welcome-heart">&#10084;</div>
@@ -626,7 +659,7 @@
   <script>
     var START_DATE = new Date('2025-10-21');
 
-    // Welcome photo vortex
+    // Welcome photo tunnel - photos fly towards you then recede into distance
     (function () {
       var photos = [
         'images/couple.jpg',
@@ -640,41 +673,32 @@
         'images/photo202607251607484966.jpg'
       ];
 
-      var stage = document.getElementById('vortexStage');
-      if (!stage) return;
+      var tunnel = document.getElementById('tunnel');
+      if (!tunnel) return;
 
-      // 3 rings, each with photos placed in a circle using 3D transforms
-      var rings = [
-        { cls: 'spin1', count: Math.min(photos.length, 6), radius: 180, y: 0, opacity: 0.5 },
-        { cls: 'spin2', count: Math.min(photos.length, 5), radius: 260, y: 20, opacity: 0.3 },
-        { cls: 'spin3', count: Math.min(photos.length, 4), radius: 340, y: -10, opacity: 0.15 }
-      ];
+      // Create 8 tunnel items with staggered delays
+      var total = 8;
+      for (var i = 0; i < total; i++) {
+        var item = document.createElement('div');
+        item.className = 'tunnel-item';
+        // Random horizontal offset from center
+        var xOff = (Math.random() - 0.5) * 120;
+        item.style.left = 'calc(50% + ' + xOff + 'px)';
+        item.style.top = 'calc(50% + ' + ((Math.random() - 0.5) * 60) + 'px)';
+        // Stagger animation start
+        var dur = 5 + Math.random() * 3;
+        var delay = (i / total) * dur;
+        item.style.animationDuration = dur + 's';
+        item.style.animationDelay = '-' + delay + 's';
 
-      rings.forEach(function (ring, ri) {
-        var el = document.createElement('div');
-        el.className = 'vortex-ring ' + ring.cls;
-        el.style.opacity = ring.opacity;
-
-        var angleStep = 360 / ring.count;
-        for (var i = 0; i < ring.count; i++) {
-          var angle = angleStep * i;
-          var photoIdx = (i + ri * 2) % photos.length;
-          var card = document.createElement('div');
-          card.className = 'vortex-card';
-          // Position in 3D circle: rotateY then translateZ
-          card.style.transform = 'rotateY(' + angle + 'deg) translateZ(' + ring.radius + 'px)';
-          card.style.top = 'calc(50% + ' + ring.y + 'px)';
-
-          if (photos[photoIdx]) {
-            card.innerHTML = '<img src="' + photos[photoIdx] + '" loading="lazy">';
-          } else {
-            card.innerHTML = '<div class="vortex-card-ph">&#128247;</div>';
-          }
-          el.appendChild(card);
+        var src = photos[i % photos.length];
+        if (src) {
+          item.innerHTML = '<img src="' + src + '" loading="lazy">';
+        } else {
+          item.innerHTML = '<div class="tunnel-item-ph">&#128247;</div>';
         }
-
-        stage.appendChild(el);
-      });
+        tunnel.appendChild(item);
+      }
     })();
 
     // Typewriter names
