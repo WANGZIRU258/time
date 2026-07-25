@@ -37,7 +37,10 @@
     /* ========== Vinyl ========== */
     .vinyl {
       position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-      width: 52px; height: 52px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      width: 56px; height: 56px; cursor: pointer; -webkit-tap-highlight-color: transparent;
+      background: rgba(0,0,0,0.7); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
     }
 
     .vinyl-disc {
@@ -328,7 +331,7 @@
 <body>
 
   <audio id="bgMusic" loop preload="auto">
-    <source src="music.mp3" type="audio/mpeg">
+    <source src="https://raw.githubusercontent.com/WANGZIRU258/time/main/music.mp3" type="audio/mpeg">
   </audio>
 
   <div class="vinyl" id="vinylPlayer">
@@ -569,11 +572,15 @@
       var playing = false;
 
       function start() {
+        vinyl.style.opacity = '0.5';
+        audio.load();
         audio.play().then(function () {
           playing = true;
           vinyl.classList.add('playing');
-        }).catch(function () {
-          alert('请检查音乐文件 music.mp3 是否存在');
+          vinyl.style.opacity = '1';
+        }).catch(function (e) {
+          vinyl.style.opacity = '1';
+          console.error('播放失败:', e);
         });
       }
 
@@ -583,12 +590,22 @@
         vinyl.classList.remove('playing');
       }
 
-      vinyl.addEventListener('click', function () {
+      vinyl.addEventListener('click', function (e) {
+        e.preventDefault();
+        e.stopPropagation();
         if (playing) {
           stop();
         } else {
           start();
         }
+      });
+
+      // 尝试自动播放
+      audio.addEventListener('canplay', function () {
+        audio.play().then(function () {
+          playing = true;
+          vinyl.classList.add('playing');
+        }).catch(function () {});
       });
     })();
   </script>
