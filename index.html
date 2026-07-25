@@ -36,7 +36,7 @@
     /* ========== Welcome Page ========== */
     .welcome {
       position: fixed; inset: 0; z-index: 10000;
-      background: linear-gradient(160deg, #0D0D0D 0%, #1A1208 40%, #0D0D0D 100%);
+      background: #0D0D0D;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       transition: opacity 1s ease, transform 1s ease;
       cursor: pointer; overflow: hidden;
@@ -46,8 +46,22 @@
       pointer-events: none;
     }
 
+    .welcome-video {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; opacity: 0.4;
+    }
+    .welcome-video-fallback {
+      position: absolute; inset: 0;
+      background: linear-gradient(160deg, #0D0D0D 0%, #1A1208 40%, #0D0D0D 100%);
+    }
+
+    .welcome-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.6) 100%);
+    }
+
     .welcome-particles {
-      position: absolute; inset: 0; pointer-events: none;
+      position: absolute; inset: 0; pointer-events: none; z-index: 1;
     }
     .welcome-particle {
       position: absolute; border-radius: 50%;
@@ -60,30 +74,24 @@
       100% { opacity: 0; transform: translateY(-500px) scale(1); }
     }
 
-    .welcome-glow {
-      position: absolute; width: 300px; height: 300px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(212,165,116,0.08) 0%, transparent 70%);
-      animation: glowPulse 4s ease-in-out infinite;
-    }
-    @keyframes glowPulse {
-      0%,100% { transform: scale(1); opacity: 0.6; }
-      50% { transform: scale(1.2); opacity: 1; }
+    .welcome-content {
+      position: relative; z-index: 2; text-align: center;
     }
 
     .welcome-ring {
-      width: 110px; height: 110px; border-radius: 50%;
-      border: 1px solid rgba(212,165,116,0.25);
+      width: 100px; height: 100px; border-radius: 50%;
+      border: 1px solid rgba(212,165,116,0.3);
       display: flex; align-items: center; justify-content: center;
-      margin-bottom: 36px; position: relative;
+      margin: 0 auto 32px; position: relative;
       animation: ringPulse 3s ease-in-out infinite;
     }
     .welcome-ring::before {
       content: ''; position: absolute; inset: -10px; border-radius: 50%;
-      border: 1px solid rgba(212,165,116,0.1);
+      border: 1px solid rgba(212,165,116,0.12);
     }
     .welcome-ring::after {
       content: ''; position: absolute; inset: -20px; border-radius: 50%;
-      border: 1px solid rgba(212,165,116,0.05);
+      border: 1px solid rgba(212,165,116,0.06);
     }
 
     @keyframes ringPulse {
@@ -92,7 +100,7 @@
     }
 
     .welcome-heart {
-      font-size: 32px; color: var(--accent-warm);
+      font-size: 30px; color: var(--accent-warm);
       animation: heartBeat 1.8s ease-in-out infinite;
     }
     @keyframes heartBeat {
@@ -105,7 +113,7 @@
 
     .welcome-names {
       font-size: clamp(20px, 5vw, 30px); color: rgba(255,255,255,0.9); letter-spacing: 8px;
-      font-weight: 200; margin-bottom: 10px; text-align: center;
+      font-weight: 200; margin-bottom: 8px;
     }
 
     .welcome-amp {
@@ -115,7 +123,7 @@
 
     .welcome-sub {
       font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 6px;
-      font-weight: 300; margin-bottom: 56px; text-transform: uppercase;
+      font-weight: 300; margin-bottom: 48px; text-transform: uppercase;
     }
 
     .welcome-btn {
@@ -129,17 +137,11 @@
       background: rgba(212,165,116,0.12); border-color: var(--accent-warm);
       transform: translateY(-2px); box-shadow: 0 12px 32px rgba(212,165,116,0.15);
     }
-    .welcome-btn::before {
-      content: ''; position: absolute; inset: -1px; border-radius: 40px;
-      background: linear-gradient(135deg, rgba(212,165,116,0.2), transparent 50%, rgba(212,165,116,0.2));
-      z-index: -1; opacity: 0; transition: opacity 0.5s;
-    }
-    .welcome-btn:hover::before { opacity: 1; }
 
     .welcome-hint {
-      position: absolute; bottom: 36px; font-size: 10px;
-      color: rgba(255,255,255,0.2); letter-spacing: 3px;
-      animation: hintFade 4s ease-in-out infinite;
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      font-size: 10px; color: rgba(255,255,255,0.2); letter-spacing: 3px;
+      animation: hintFade 4s ease-in-out infinite; z-index: 2;
     }
     @keyframes hintFade {
       0%,100% { opacity: 0.2; }
@@ -317,9 +319,6 @@
     .quote-text {
       font-size: 14px; color: var(--text-secondary); line-height: 2.2; font-weight: 300;
     }
-    .quote-author {
-      font-size: 11px; color: var(--accent); letter-spacing: 2px; margin-top: 12px; font-weight: 300;
-    }
 
     /* ========== Section Divider ========== */
     .section-divider {
@@ -336,6 +335,7 @@
     .month-label {
       text-align: center; padding: 40px 0 24px; position: relative; z-index: 2;
     }
+    .month-label:first-child { padding-top: 0; }
     .month-label-inner {
       display: inline-flex; align-items: center; gap: 12px;
       padding: 6px 20px; background: var(--bg); border-radius: 20px;
@@ -357,14 +357,13 @@
     }
 
     .vine-svg {
-      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      position: absolute; top: 0; left: 0;
       width: 100%; height: 100%; pointer-events: none; z-index: 0;
+      overflow: visible;
     }
 
     .vine-path {
-      fill: none; stroke: var(--vine); stroke-width: 1.5; stroke-linecap: round;
-      stroke-dasharray: 2000; stroke-dashoffset: 2000;
-      transition: stroke-dashoffset 0.05s linear;
+      fill: none; stroke: var(--vine); stroke-width: 2; stroke-linecap: round;
     }
 
     .vine-leaf {
@@ -372,7 +371,7 @@
       opacity: 0; transition: opacity 0.6s ease, transform 0.6s ease;
       transform: scale(0) rotate(-30deg);
     }
-    .vine-leaf.visible { opacity: 0.4; transform: scale(1) rotate(0deg); }
+    .vine-leaf.visible { opacity: 0.45; transform: scale(1) rotate(0deg); }
 
     /* ========== Memory Card ========== */
     .mem {
@@ -501,7 +500,6 @@
     /* ========== Mobile ========== */
     @media (max-width: 640px) {
       .hero { min-height: 100svh; padding: 0 16px; }
-      .vine-svg { left: 28px; transform: none; width: 4px; }
       .mem { padding: 0 16px 40px 48px !important; justify-content: flex-start !important; }
       .mem-dot { left: -28px !important; right: auto !important; }
       .mem-stem { left: -20px !important; right: auto !important; }
@@ -517,7 +515,7 @@
       .mem-card { opacity: 1; transform: none; transition: none; }
       .scroll-hint { animation: none; }
       .vinyl-disc { animation: none; }
-      .vine-leaf { transition: none; opacity: 0.4; transform: none; }
+      .vine-leaf { transition: none; opacity: 0.45; transform: none; }
       .welcome-heart { animation: none; }
     }
   </style>
@@ -528,19 +526,23 @@
     <source src="music.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- Progress Bar -->
   <div class="progress-bar" id="progressBar"></div>
 
   <!-- Welcome Page -->
   <div class="welcome" id="welcome">
+    <div class="welcome-video-fallback"></div>
+    <!-- 把你的视频文件放到同目录，命名为 welcome.mp4，取消下面注释即可 -->
+    <!-- <video class="welcome-video" autoplay muted loop playsinline><source src="welcome.mp4" type="video/mp4"></video> -->
+    <div class="welcome-overlay"></div>
     <div class="welcome-particles" id="welcomeParticles"></div>
-    <div class="welcome-glow"></div>
-    <div class="welcome-ring">
-      <div class="welcome-heart">&#10084;</div>
+    <div class="welcome-content">
+      <div class="welcome-ring">
+        <div class="welcome-heart">&#10084;</div>
+      </div>
+      <div class="welcome-names">刘宣富 <span class="welcome-amp">&</span> 穆奕彤</div>
+      <div class="welcome-sub">Our Love Story</div>
+      <button class="welcome-btn">点击进入</button>
     </div>
-    <div class="welcome-names">刘宣富 <span class="welcome-amp">&</span> 穆奕彤</div>
-    <div class="welcome-sub">Our Love Story</div>
-    <button class="welcome-btn" id="welcomeBtn">点击进入</button>
     <div class="welcome-hint">请佩戴耳机获得最佳体验</div>
   </div>
 
@@ -625,7 +627,7 @@
 
     <!-- Vine Timeline -->
     <section class="vine-section" id="vineSection">
-      <svg class="vine-svg" id="vineSvg" preserveAspectRatio="none">
+      <svg class="vine-svg" id="vineSvg">
         <path class="vine-path" id="vinePath" d=""></path>
       </svg>
       <div id="vineLeaves"></div>
@@ -687,9 +689,7 @@
           vinyl.classList.add('show');
         }, 500);
 
-        setTimeout(function () {
-          welcome.style.display = 'none';
-        }, 1100);
+        setTimeout(function () { welcome.style.display = 'none'; }, 1100);
       }
 
       welcome.addEventListener('click', enterSite);
@@ -697,6 +697,7 @@
 
     // Timer + Stats
     (function () {
+      var TOGETHER = new Date('2026-03-07');
       function tick() {
         var now = new Date();
         var d = Math.floor((now - START_DATE) / 1000);
@@ -707,10 +708,8 @@
         document.getElementById('tHour').textContent = h;
         document.getElementById('tMin').textContent = m;
         document.getElementById('tSec').textContent = s;
-
-        // Stats
         document.getElementById('statDays').textContent = Math.floor((now - START_DATE) / 86400000);
-        document.getElementById('statTogether').textContent = Math.max(0, Math.floor((now - TOGETHER_DATE) / 86400000));
+        document.getElementById('statTogether').textContent = Math.max(0, Math.floor((now - TOGETHER) / 86400000));
       }
       tick(); setInterval(tick, 1000);
     })();
@@ -731,7 +730,7 @@
           {"date":"2025 / 10","title":"第一次聊天","text":"从陌生到熟悉，每一句话都让彼此的心更近一点。","img":"","gallery":["",""]},
           {"date":"2025 / 11","title":"慢慢了解","text":"开始分享日常，早安晚安成了习惯，手机里多了一个特别的置顶。","img":""},
           {"date":"2025 / 11","title":"第一次见面","text":"终于从屏幕走到现实，看到真实的你，比想象中更让人心动。","img":"","highlight":true,"tag":"里程碑"},
-          {"date":"2025 / 12","title":"冬天的温暖","text":"天冷了，但有你在的每一天都是暖的。一起走过的街道，连风都变得温柔。","img":"", "gallery":["","",""]},
+          {"date":"2025 / 12","title":"冬天的温暖","text":"天冷了，但有你在的每一天都是暖的。一起走过的街道，连风都变得温柔。","img":"","gallery":["","",""]},
           {"date":"2025 / 12 / 25","title":"第一个圣诞节","text":"今年的圣诞树下，多了一个想一起许愿的人。","img":"","tag":"节日"},
           {"date":"2025 / 12 / 31","title":"跨年夜","text":"倒计时的最后一秒，身边是你，这就是最好的跨年方式。","img":"","highlight":true,"tag":"节日"},
           {"date":"2026 / 01","title":"新年第一天","text":"新的一年，第一个想见的人是你，第一个想说的话也是给你。","img":""},
@@ -752,10 +751,7 @@
         ]
       };
 
-      // Count memories for stats
-      var memCount = DATA.memories.length;
-      var memCountEl = document.getElementById('statMemories');
-      if (memCountEl) memCountEl.textContent = memCount;
+      document.getElementById('statMemories').textContent = DATA.memories.length;
 
       function loadMemories(data) {
         container.innerHTML = '';
@@ -764,139 +760,137 @@
           var side = i % 2 === 0 ? 'left' : 'right';
           var hl = item.highlight ? ' highlight' : '';
 
-          // Month separator
-          var month = item.date.split('/')[0].trim() + '/' + item.date.split('/')[1].trim();
+          var parts = item.date.split('/');
+          var month = parts[0].trim() + '/' + parts[1].trim();
           if (month !== lastMonth) {
             lastMonth = month;
-            var monthNames = {'2025/10':'2025年10月','2025/11':'2025年11月','2025/12':'2025年12月',
+            var mn = {'2025/10':'2025年10月','2025/11':'2025年11月','2025/12':'2025年12月',
               '2026/01':'2026年1月','2026/02':'2026年2月','2026/03':'2026年3月',
               '2026/04':'2026年4月','2026/05':'2026年5月','2026/06':'2026年6月','2026/07':'2026年7月'};
-            var mLabel = monthNames[month] || month;
             container.insertAdjacentHTML('beforeend',
-              '<div class="month-label"><div class="month-label-inner"><div class="month-label-dot"></div><div class="month-label-text">' + mLabel + '</div><div class="month-label-dot"></div></div></div>');
+              '<div class="month-label"><div class="month-label-inner"><div class="month-label-dot"></div><div class="month-label-text">' + (mn[month]||month) + '</div><div class="month-label-dot"></div></div></div>');
           }
 
-          // Image / Gallery
           var mediaHtml = '';
           if (item.gallery && item.gallery.length > 0) {
             var gc = item.gallery.length >= 3 ? 'g3' : 'g2';
             mediaHtml = '<div class="mem-gallery ' + gc + '">';
             item.gallery.forEach(function (g) {
-              mediaHtml += '<div class="mem-gallery-item">' + (g ? '<img src="' + g + '" loading="lazy">' : '<div class="mem-img-ph">&#128247;</div>') + '</div>';
+              mediaHtml += '<div class="mem-gallery-item">' + (g ? '<img src="'+g+'" loading="lazy">' : '<div class="mem-img-ph">&#128247;</div>') + '</div>';
             });
             mediaHtml += '</div>';
           } else if (item.img) {
-            mediaHtml = '<div class="mem-img"><img src="' + item.img + '" alt="' + item.title + '" loading="lazy"></div>';
+            mediaHtml = '<div class="mem-img"><img src="'+item.img+'" alt="'+item.title+'" loading="lazy"></div>';
           } else {
             mediaHtml = '<div class="mem-img"><div class="mem-img-ph">&#128247;</div></div>';
           }
 
-          var tagHtml = item.tag ? '<div class="mem-tag">' + item.tag + '</div>' : '';
+          var tagHtml = item.tag ? '<div class="mem-tag">'+item.tag+'</div>' : '';
 
-          var html = '<div class="mem ' + side + '" data-vine>'
-            + '<div class="mem-card' + hl + '">'
-            + '<div class="mem-date">' + item.date + '</div>'
-            + '<div class="mem-title">' + item.title + '</div>'
-            + '<div class="mem-text">' + item.text + '</div>'
-            + mediaHtml
-            + tagHtml
-            + '</div>'
-            + '<div class="mem-dot"></div>'
-            + '<div class="mem-stem"></div>'
-            + '</div>';
-          container.insertAdjacentHTML('beforeend', html);
+          container.insertAdjacentHTML('beforeend',
+            '<div class="mem '+side+'" data-vine>'
+            + '<div class="mem-card'+hl+'">'
+            + '<div class="mem-date">'+item.date+'</div>'
+            + '<div class="mem-title">'+item.title+'</div>'
+            + '<div class="mem-text">'+item.text+'</div>'
+            + mediaHtml + tagHtml
+            + '</div><div class="mem-dot"></div><div class="mem-stem"></div></div>');
         });
       }
 
+      // Init data
       (function () {
-        var data = DATA;
-        if (data.hero) {
-          var h = data.hero;
-          if (h.img) {
-            document.getElementById('heroPlaceholder').style.display = 'none';
-            var img = document.createElement('img');
-            img.src = h.img;
-            img.alt = '我们';
-            document.getElementById('heroPhoto').appendChild(img);
-          }
-          if (h.startDate) document.getElementById('heroStartDate').textContent = h.startDate;
-          if (h.quote) document.getElementById('quoteText').innerHTML = h.quote;
-          if (h.names) {
-            document.getElementById('footerNames').innerHTML = '刘宣富 <span class="footer-heart">&#10084;</span> ' + h.names.split('&')[1].trim();
-          }
-          if (h.startDate) START_DATE = new Date(h.startDate);
+        var h = DATA.hero;
+        if (h.img) {
+          document.getElementById('heroPlaceholder').style.display = 'none';
+          var img = document.createElement('img');
+          img.src = h.img; img.alt = '我们';
+          document.getElementById('heroPhoto').appendChild(img);
         }
-        var memories = data.memories || data;
-        loadMemories(memories);
-        buildLeaves();
-        initVine();
+        if (h.startDate) document.getElementById('heroStartDate').textContent = h.startDate;
+        if (h.quote) document.getElementById('quoteText').innerHTML = h.quote;
+        if (h.startDate) START_DATE = new Date(h.startDate);
+
+        loadMemories(DATA.memories);
+
+        // Wait for DOM to render, then build vine
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            buildVine();
+          });
+        });
       })();
 
-      function buildPath() {
-        var items = document.querySelectorAll('.mem');
+      var totalLen = 0;
+
+      function buildVine() {
+        var memEls = document.querySelectorAll('.mem');
         var w = section.offsetWidth;
         var h = section.offsetHeight;
         var cx = isMobile ? 28 : w / 2;
-        var count = items.length;
-        var segH = h / Math.max(count, 1);
-        var points = [];
-        var steps = 80;
+        var count = memEls.length;
 
-        for (var i = 0; i <= steps; i++) {
-          var t = i / steps;
-          var y = t * h;
-          var waveAmp = isMobile ? 0 : 18 + Math.sin(t * Math.PI) * 12;
-          var x = cx + Math.sin(t * count * Math.PI) * waveAmp;
-          points.push({ x: x, y: y });
+        // Set SVG viewBox to match section size
+        svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+        svg.style.width = w + 'px';
+        svg.style.height = h + 'px';
+
+        // Build smooth path through card positions
+        var points = [];
+        memEls.forEach(function (el, i) {
+          var card = el.querySelector('.mem-card');
+          var rect = card.getBoundingClientRect();
+          var sectionRect = section.getBoundingClientRect();
+          var cy = rect.top - sectionRect.top + 20;
+          var cx2 = isMobile ? 28 : (el.classList.contains('left') ? rect.right - sectionRect.left + 12 : rect.left - sectionRect.left - 12);
+          points.push({ x: cx2, y: cy });
+        });
+
+        // Add start and end points
+        if (points.length > 0) {
+          points.unshift({ x: points[0].x, y: 0 });
+          points.push({ x: points[points.length-1].x, y: h });
         }
 
+        // Build smooth cubic bezier path
         var d = 'M ' + points[0].x.toFixed(1) + ' ' + points[0].y.toFixed(1);
         for (var j = 0; j < points.length - 1; j++) {
           var p0 = points[Math.max(0, j - 1)];
           var p1 = points[j];
           var p2 = points[j + 1];
           var p3 = points[Math.min(points.length - 1, j + 2)];
-          var cp1x = p1.x + (p2.x - p0.x) / 6;
-          var cp1y = p1.y + (p2.y - p0.y) / 6;
-          var cp2x = p2.x - (p3.x - p1.x) / 6;
-          var cp2y = p2.y - (p3.y - p1.y) / 6;
+          var tension = 5;
+          var cp1x = p1.x + (p2.x - p0.x) / tension;
+          var cp1y = p1.y + (p2.y - p0.y) / tension;
+          var cp2x = p2.x - (p3.x - p1.x) / tension;
+          var cp2y = p2.y - (p3.y - p1.y) / tension;
           d += ' C ' + cp1x.toFixed(1) + ' ' + cp1y.toFixed(1)
             + ', ' + cp2x.toFixed(1) + ' ' + cp2y.toFixed(1)
             + ', ' + p2.x.toFixed(1) + ' ' + p2.y.toFixed(1);
         }
 
         path.setAttribute('d', d);
-        var len = path.getTotalLength();
-        path.style.strokeDasharray = len;
-        path.style.strokeDashoffset = len;
-        return len;
-      }
+        totalLen = path.getTotalLength();
+        path.style.strokeDasharray = totalLen;
+        path.style.strokeDashoffset = totalLen;
 
-      var totalLen = 0;
-
-      function buildLeaves() {
+        // Build leaves
         leavesBox.innerHTML = '';
-        var items = document.querySelectorAll('.mem');
-        var w = section.offsetWidth;
-        var cx = isMobile ? 28 : w / 2;
-        var h = section.offsetHeight;
-        var segH = h / Math.max(items.length, 1);
-
-        for (var i = 0; i < items.length; i++) {
-          var y = segH * i + segH * 0.5;
+        memEls.forEach(function (el, i) {
+          if (i >= points.length - 2) return;
+          var pt = points[i + 1];
           var side = i % 2 === 0 ? 1 : -1;
-          var lx = cx + side * (isMobile ? 8 : 24);
+          var lx = pt.x + side * (isMobile ? 10 : 20);
+          var ly = pt.y;
           var leaf = document.createElement('div');
           leaf.className = 'vine-leaf';
           leaf.style.left = lx + 'px';
-          leaf.style.top = y + 'px';
+          leaf.style.top = ly + 'px';
           leaf.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#B8C9A3" stroke-width="1.5"><path d="M12 2C6 8 2 14 12 22C22 14 18 8 12 2Z"/><line x1="12" y1="8" x2="12" y2="22"/></svg>';
           leavesBox.appendChild(leaf);
-        }
-      }
+        });
 
-      function initVine() {
-        totalLen = buildPath();
+        // Scroll handler
         var memCards = document.querySelectorAll('.mem-card');
         var memDots = document.querySelectorAll('.mem-dot');
         var memStems = document.querySelectorAll('.mem-stem');
@@ -910,7 +904,7 @@
           var progress = Math.min(scrolled / total, 1);
           path.style.strokeDashoffset = totalLen * (1 - progress);
 
-          document.querySelectorAll('.mem').forEach(function (item, i) {
+          memEls.forEach(function (item, i) {
             var r = item.getBoundingClientRect();
             if (r.top < viewH * 0.82) {
               if (memCards[i]) memCards[i].classList.add('visible');
@@ -927,9 +921,8 @@
 
       window.addEventListener('resize', function () {
         isMobile = window.innerWidth <= 640;
-        if (totalLen > 0) {
-          totalLen = buildPath();
-          buildLeaves();
+        if (document.querySelectorAll('.mem').length > 0) {
+          buildVine();
         }
       });
     })();
@@ -969,9 +962,7 @@
           playing = true;
           vinyl.classList.add('playing');
           vinyl.style.opacity = '1';
-        }).catch(function () {
-          vinyl.style.opacity = '1';
-        });
+        }).catch(function () { vinyl.style.opacity = '1'; });
       }
 
       function stop() {
