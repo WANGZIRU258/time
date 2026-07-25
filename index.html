@@ -44,16 +44,16 @@
     /* ========== Welcome ========== */
     .welcome {
       position: fixed; inset: 0; z-index: 10000;
-      background: linear-gradient(160deg, #2D1B28 0%, #3A2233 40%, #2D1B28 100%);
+      background: var(--bg);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       transition: opacity 1s ease, transform 1s ease;
       cursor: pointer; overflow: hidden;
     }
-    .welcome.hide { opacity: 0; transform: scale(1.06); pointer-events: none; }
+    .welcome.hide { opacity: 0; transform: scale(1.04); pointer-events: none; }
 
     .welcome-bg-warm {
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 50% 40%, rgba(232,136,154,0.12) 0%, transparent 60%);
+      background: radial-gradient(ellipse at 50% 50%, rgba(232,136,154,0.06) 0%, transparent 60%);
     }
 
     .welcome-particles { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
@@ -63,24 +63,24 @@
     }
     @keyframes floatUp {
       0% { opacity: 0; transform: translateY(0) scale(0); }
-      15% { opacity: 0.7; }
-      100% { opacity: 0; transform: translateY(-500px) scale(1.2); }
+      15% { opacity: 0.5; }
+      100% { opacity: 0; transform: translateY(-400px) scale(1.2); }
     }
 
     .welcome-content { position: relative; z-index: 3; text-align: center; }
 
     .welcome-heart-wrap {
-      width: 90px; height: 90px; border-radius: 50%;
-      border: 1.5px solid rgba(232,136,154,0.3);
+      width: 80px; height: 80px; border-radius: 50%;
+      border: 1.5px solid rgba(232,136,154,0.2);
       display: flex; align-items: center; justify-content: center;
       margin: 0 auto 28px; position: relative;
     }
     .welcome-heart-wrap::before {
-      content: ''; position: absolute; inset: -10px; border-radius: 50%;
-      border: 1px solid rgba(232,136,154,0.12);
+      content: ''; position: absolute; inset: -8px; border-radius: 50%;
+      border: 1px solid rgba(232,136,154,0.08);
     }
     .welcome-heart {
-      font-size: 30px; animation: heartBeat 1.5s ease-in-out infinite;
+      font-size: 28px; color: var(--pink); animation: heartBeat 1.5s ease-in-out infinite;
     }
     @keyframes heartBeat {
       0%,100% { transform: scale(1); }
@@ -90,39 +90,50 @@
       48% { transform: scale(1); }
     }
 
+    .welcome-names-wrap {
+      min-height: 48px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center;
+    }
     .welcome-names {
       font-family: var(--serif);
-      font-size: clamp(22px, 5vw, 32px); color: rgba(255,255,255,0.9);
-      letter-spacing: 6px; font-weight: 500; margin-bottom: 8px;
+      font-size: clamp(22px, 5vw, 32px); color: var(--text);
+      letter-spacing: 6px; font-weight: 500;
     }
     .welcome-amp {
       color: var(--pink); font-size: 18px; margin: 0 6px;
       font-style: italic; font-weight: 400;
     }
+    .welcome-cursor {
+      display: inline-block; width: 2px; height: 1em; background: var(--pink);
+      margin-left: 2px; vertical-align: middle;
+      animation: cursorBlink 0.8s step-end infinite;
+    }
+    @keyframes cursorBlink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
     .welcome-sub {
-      font-size: 11px; color: rgba(232,136,154,0.5); letter-spacing: 5px;
-      font-weight: 400; margin-bottom: 40px; text-transform: uppercase;
+      font-size: 11px; color: var(--pink); letter-spacing: 5px;
+      font-weight: 400; margin-bottom: 40px; text-transform: uppercase; opacity: 0.5;
     }
 
     .welcome-btn {
-      padding: 13px 44px; background: rgba(232,136,154,0.15);
-      border: 1px solid rgba(232,136,154,0.4);
-      color: var(--pink); font-size: 13px; letter-spacing: 4px;
+      padding: 12px 40px; background: var(--pink-bg);
+      border: 1px solid rgba(232,136,154,0.2);
+      color: var(--pink); font-size: 13px; letter-spacing: 3px;
       cursor: pointer; border-radius: 36px; transition: all 0.4s ease;
-      font-family: var(--sans); font-weight: 400;
+      font-family: var(--sans); font-weight: 400; opacity: 0;
     }
+    .welcome-btn.show { opacity: 1; transition: opacity 0.6s ease; }
     .welcome-btn:hover {
-      background: rgba(232,136,154,0.25);
-      box-shadow: 0 0 28px rgba(232,136,154,0.2);
-      transform: translateY(-2px);
+      background: rgba(232,136,154,0.2);
+      box-shadow: 0 4px 20px rgba(232,136,154,0.12);
+      transform: translateY(-1px);
     }
 
     .welcome-hint {
       position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
-      font-size: 9px; color: rgba(232,136,154,0.25); letter-spacing: 3px;
+      font-size: 9px; color: var(--pink); letter-spacing: 3px; opacity: 0.3;
       animation: hintFade 4s ease-in-out infinite; z-index: 2;
     }
-    @keyframes hintFade { 0%,100% { opacity: 0.2; } 50% { opacity: 0.45; } }
+    @keyframes hintFade { 0%,100% { opacity: 0.2; } 50% { opacity: 0.4; } }
 
     /* ========== Main ========== */
     .main-content { opacity: 0; transition: opacity 0.7s ease 0.4s; }
@@ -488,9 +499,11 @@
     <div class="welcome-particles" id="welcomeParticles"></div>
     <div class="welcome-content">
       <div class="welcome-heart-wrap"><div class="welcome-heart">&#10084;</div></div>
-      <div class="welcome-names">刘宣富 <span class="welcome-amp">&</span> 穆奕彤</div>
-      <div class="welcome-sub">Our Love Story</div>
-      <button class="welcome-btn">点击进入</button>
+      <div class="welcome-names-wrap">
+        <div class="welcome-names" id="welcomeNames"></div>
+      </div>
+      <div class="welcome-sub" id="welcomeSub" style="opacity:0">Our Love Story</div>
+      <button class="welcome-btn" id="welcomeBtn">点击进入</button>
     </div>
     <div class="welcome-hint">请佩戴耳机获得最佳体验</div>
   </div>
@@ -601,6 +614,39 @@
         p.style.cssText = 'width:'+s+'px;height:'+s+'px;left:'+Math.random()*100+'%;top:'+(55+Math.random()*45)+'%;animation-delay:'+Math.random()*8+'s;animation-duration:'+(5+Math.random()*5)+'s;background:'+c;
         box.appendChild(p);
       }
+    })();
+
+    // Typewriter names
+    (function () {
+      var el = document.getElementById('welcomeNames');
+      var sub = document.getElementById('welcomeSub');
+      var btn = document.getElementById('welcomeBtn');
+      var full = '刘宣富 & 穆奕彤';
+      var i = 0;
+
+      // Hide & button, show cursor
+      el.innerHTML = '<span class="welcome-cursor"></span>';
+
+      function type() {
+        if (i < full.length) {
+          var ch = full[i];
+          if (ch === '&') {
+            el.innerHTML = full.substring(0, i) + '<span class="welcome-amp">&amp;</span><span class="welcome-cursor"></span>';
+          } else {
+            el.innerHTML = full.substring(0, i + 1) + '<span class="welcome-cursor"></span>';
+          }
+          i++;
+          setTimeout(type, ch === ' ' ? 180 : (ch === '&' ? 300 : 140));
+        } else {
+          // Done typing — remove cursor, fade in sub + btn
+          el.innerHTML = '刘宣富 <span class="welcome-amp">&amp;</span> 穆奕彤';
+          sub.style.transition = 'opacity 0.6s ease';
+          sub.style.opacity = '1';
+          setTimeout(function () { btn.classList.add('show'); }, 400);
+        }
+      }
+
+      setTimeout(type, 800);
     })();
 
     // Welcome -> Main
