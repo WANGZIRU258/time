@@ -524,6 +524,14 @@
 </head>
 <body>
 
+  <!-- Loading -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-pct" id="loadingPct">0%</div>
+    <div class="loading-label">音乐加载中</div>
+    <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar"></div></div>
+  </div>
+
   <audio id="bgMusic" loop preload="auto" src="music.mp3"></audio>
   <div class="progress-bar" id="progressBar"></div>
 
@@ -636,6 +644,39 @@
 
   <script>
     var START_DATE = new Date('2025-10-21');
+
+    // Audio loading progress
+    (function () {
+      var audio = document.getElementById('bgMusic');
+      var overlay = document.getElementById('loadingOverlay');
+      var pctEl = document.getElementById('loadingPct');
+      var bar = document.getElementById('loadingBar');
+      var loaded = false;
+
+      function updateProgress() {
+        if (audio.buffered.length > 0) {
+          var pct = Math.floor((audio.buffered.end(audio.buffered.length - 1) / audio.duration) * 100);
+          bar.style.width = pct + '%';
+          pctEl.textContent = pct + '%';
+        }
+      }
+
+      function done() {
+        if (loaded) return;
+        loaded = true;
+        bar.style.width = '100%';
+        pctEl.textContent = '100%';
+        setTimeout(function () {
+          overlay.classList.add('hide');
+          setTimeout(function () { overlay.style.display = 'none'; }, 600);
+        }, 300);
+      }
+
+      audio.addEventListener('progress', updateProgress);
+      audio.addEventListener('canplay', done);
+      // Force done after 8s max
+      setTimeout(done, 8000);
+    })();
 
     // Welcome photo converge - photos fly from edges to center and vanish
     (function () {
