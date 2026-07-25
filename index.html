@@ -44,96 +44,67 @@
     /* ========== Welcome ========== */
     .welcome {
       position: fixed; inset: 0; z-index: 10000;
-      background: var(--bg);
+      background: #FFFAF7;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      transition: opacity 1s ease, transform 1s ease;
+      transition: opacity 0.8s ease, transform 0.8s ease;
       cursor: pointer; overflow: hidden;
     }
-    .welcome.hide { opacity: 0; transform: scale(1.04); pointer-events: none; }
-
-    .welcome-bg-warm {
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse at 50% 50%, rgba(232,136,154,0.06) 0%, transparent 60%);
-    }
-
-    .welcome-particles { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
-    .welcome-particle {
-      position: absolute; border-radius: 50%;
-      opacity: 0; animation: floatUp 8s ease-in infinite;
-    }
-    @keyframes floatUp {
-      0% { opacity: 0; transform: translateY(0) scale(0); }
-      15% { opacity: 0.5; }
-      100% { opacity: 0; transform: translateY(-400px) scale(1.2); }
-    }
+    .welcome.hide { opacity: 0; transform: scale(1.03); pointer-events: none; }
 
     .welcome-content { position: relative; z-index: 3; text-align: center; }
 
-    .welcome-heart-wrap {
-      width: 80px; height: 80px; border-radius: 50%;
-      border: 1.5px solid rgba(232,136,154,0.2);
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 28px; position: relative;
-    }
-    .welcome-heart-wrap::before {
-      content: ''; position: absolute; inset: -8px; border-radius: 50%;
-      border: 1px solid rgba(232,136,154,0.08);
-    }
     .welcome-heart {
-      font-size: 28px; color: var(--pink); animation: heartBeat 1.5s ease-in-out infinite;
+      font-size: 24px; color: #D4738B; margin-bottom: 24px;
+      animation: heartBeat 1.5s ease-in-out infinite;
     }
     @keyframes heartBeat {
       0%,100% { transform: scale(1); }
-      12% { transform: scale(1.22); }
+      12% { transform: scale(1.18); }
       24% { transform: scale(1); }
-      36% { transform: scale(1.15); }
+      36% { transform: scale(1.12); }
       48% { transform: scale(1); }
     }
 
     .welcome-names-wrap {
-      min-height: 48px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center;
+      min-height: 44px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center;
     }
     .welcome-names {
       font-family: var(--serif);
-      font-size: clamp(22px, 5vw, 32px); color: var(--text);
+      font-size: clamp(20px, 5vw, 30px); color: #3D2E2E;
       letter-spacing: 6px; font-weight: 500;
     }
     .welcome-amp {
-      color: var(--pink); font-size: 18px; margin: 0 6px;
+      color: #D4738B; font-size: 16px; margin: 0 6px;
       font-style: italic; font-weight: 400;
     }
     .welcome-cursor {
-      display: inline-block; width: 2px; height: 1em; background: var(--pink);
-      margin-left: 2px; vertical-align: middle;
+      display: inline-block; width: 1.5px; height: 0.9em; background: #D4738B;
+      margin-left: 2px; vertical-align: middle; opacity: 0.6;
       animation: cursorBlink 0.8s step-end infinite;
     }
-    @keyframes cursorBlink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+    @keyframes cursorBlink { 0%,100% { opacity: 0.6; } 50% { opacity: 0; } }
 
     .welcome-sub {
-      font-size: 11px; color: var(--pink); letter-spacing: 5px;
-      font-weight: 400; margin-bottom: 40px; text-transform: uppercase; opacity: 0.5;
+      font-size: 11px; color: #B8A0A0; letter-spacing: 5px;
+      font-weight: 400; margin-bottom: 40px; text-transform: uppercase;
     }
 
     .welcome-btn {
-      padding: 12px 40px; background: var(--pink-bg);
-      border: 1px solid rgba(232,136,154,0.2);
-      color: var(--pink); font-size: 13px; letter-spacing: 3px;
-      cursor: pointer; border-radius: 36px; transition: all 0.4s ease;
+      padding: 11px 36px; background: transparent;
+      border: 1px solid #E8D5D5;
+      color: #B88090; font-size: 12px; letter-spacing: 3px;
+      cursor: pointer; border-radius: 32px; transition: all 0.3s ease;
       font-family: var(--sans); font-weight: 400; opacity: 0;
     }
-    .welcome-btn.show { opacity: 1; transition: opacity 0.6s ease; }
+    .welcome-btn.show { opacity: 1; transition: opacity 0.5s ease; }
     .welcome-btn:hover {
-      background: rgba(232,136,154,0.2);
-      box-shadow: 0 4px 20px rgba(232,136,154,0.12);
-      transform: translateY(-1px);
+      background: #FFF5F5; border-color: #D4A8B8;
     }
 
     .welcome-hint {
-      position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
-      font-size: 9px; color: var(--pink); letter-spacing: 3px; opacity: 0.3;
-      animation: hintFade 4s ease-in-out infinite; z-index: 2;
+      position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+      font-size: 9px; color: #C8B0B0; letter-spacing: 2px;
     }
-    @keyframes hintFade { 0%,100% { opacity: 0.2; } 50% { opacity: 0.4; } }
 
     /* ========== Main ========== */
     .main-content { opacity: 0; transition: opacity 0.7s ease 0.4s; }
@@ -142,50 +113,49 @@
     /* ========== Vinyl ========== */
     .vinyl {
       position: fixed; bottom: 24px; right: 24px; z-index: 9999;
-      width: 50px; height: 50px; cursor: pointer;
-      background: rgba(60,30,40,0.85); border-radius: 50%;
+      width: 48px; height: 48px; cursor: pointer;
+      background: #F5EEEA; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 18px rgba(60,30,40,0.25);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
       opacity: 0; transform: scale(0.5); transition: all 0.5s cubic-bezier(0.34,1.56,0.64,1);
-      backdrop-filter: blur(8px);
     }
     .vinyl.show { opacity: 1; transform: scale(1); }
     .vinyl-disc {
       width: 100%; height: 100%; border-radius: 50%;
-      background: radial-gradient(circle at 40% 40%, #4A2535, #2A1520);
+      background: #E8DDD8;
       position: relative;
       animation: spin 2.8s linear infinite; animation-play-state: paused;
     }
     .vinyl.playing .vinyl-disc { animation-play-state: running; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .vinyl-disc::before {
-      content: ''; position: absolute; top: 5px; left: 5px; right: 5px; bottom: 5px;
+      content: ''; position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px;
       border-radius: 50%;
-      background: repeating-radial-gradient(circle, transparent 0 1.5px, rgba(255,255,255,0.03) 1.5px 2.5px);
+      background: repeating-radial-gradient(circle, transparent 0 1px, rgba(255,255,255,0.4) 1px 2px);
     }
     .vinyl-label {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 14px; height: 14px; border-radius: 50%; background: var(--pink);
+      width: 12px; height: 12px; border-radius: 50%; background: #D4738B;
     }
     .vinyl-label::after {
       content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 4px; height: 4px; border-radius: 50%; background: #2A1520;
+      width: 3px; height: 3px; border-radius: 50%; background: #F5EEEA;
     }
     .vinyl-icon {
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
       z-index: 2; pointer-events: none;
     }
-    .vinyl-icon svg { width: 13px; height: 13px; fill: #F4C2CE; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)); }
+    .vinyl-icon svg { width: 12px; height: 12px; fill: #B88090; }
     .vinyl.playing .vinyl-icon { display: none; }
-    .vinyl-note { position: absolute; font-size: 10px; opacity: 0; pointer-events: none; color: var(--pink); }
+    .vinyl-note { position: absolute; font-size: 9px; opacity: 0; pointer-events: none; color: #D4738B; }
     .vinyl.playing .vinyl-note { animation: noteUp 2.5s ease-out infinite; }
-    .vinyl-note:nth-child(1) { top: -6px; right: 2px; }
-    .vinyl-note:nth-child(2) { top: -2px; right: -6px; animation-delay: 0.8s; }
-    .vinyl-note:nth-child(3) { top: -8px; right: 8px; animation-delay: 1.6s; }
+    .vinyl-note:nth-child(1) { top: -5px; right: 2px; }
+    .vinyl-note:nth-child(2) { top: -1px; right: -5px; animation-delay: 0.8s; }
+    .vinyl-note:nth-child(3) { top: -7px; right: 6px; animation-delay: 1.6s; }
     @keyframes noteUp {
       0% { opacity: 0; transform: translateY(0) scale(0.8); }
-      15% { opacity: 0.8; }
-      100% { opacity: 0; transform: translateY(-24px) translateX(8px) scale(1); }
+      15% { opacity: 0.6; }
+      100% { opacity: 0; transform: translateY(-20px) translateX(6px) scale(1); }
     }
 
     /* ========== Hero ========== */
@@ -196,8 +166,8 @@
     }
     .hero-glow {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 380px; height: 380px; border-radius: 50%;
-      background: radial-gradient(circle, rgba(232,136,154,0.06) 0%, transparent 70%);
+      width: 360px; height: 360px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,136,154,0.04) 0%, transparent 70%);
       pointer-events: none;
     }
 
@@ -380,7 +350,7 @@
     /* ========== Modal ========== */
     .modal-mask {
       position: fixed; inset: 0; z-index: 10001;
-      background: rgba(45,27,40,0.55); backdrop-filter: blur(6px);
+      background: rgba(60,40,40,0.3); backdrop-filter: blur(4px);
       display: flex; align-items: center; justify-content: center;
       opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
       padding: 20px;
@@ -391,7 +361,7 @@
       background: var(--bg-card); border-radius: 18px; max-width: 500px; width: 100%;
       max-height: 85vh; overflow-y: auto; position: relative;
       transform: translateY(16px) scale(0.97); transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
-      box-shadow: 0 20px 56px rgba(45,27,40,0.2);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.1);
     }
     .modal-mask.open .modal { transform: translateY(0) scale(1); }
 
@@ -495,10 +465,8 @@
 
   <!-- Welcome -->
   <div class="welcome" id="welcome">
-    <div class="welcome-bg-warm"></div>
-    <div class="welcome-particles" id="welcomeParticles"></div>
     <div class="welcome-content">
-      <div class="welcome-heart-wrap"><div class="welcome-heart">&#10084;</div></div>
+      <div class="welcome-heart">&#10084;</div>
       <div class="welcome-names-wrap">
         <div class="welcome-names" id="welcomeNames"></div>
       </div>
@@ -602,19 +570,6 @@
 
   <script>
     var START_DATE = new Date('2025-10-21');
-
-    // Particles
-    (function () {
-      var box = document.getElementById('welcomeParticles');
-      for (var i = 0; i < 25; i++) {
-        var p = document.createElement('div');
-        p.className = 'welcome-particle';
-        var s = Math.random() * 2.5 + 1;
-        var c = Math.random() > 0.5 ? '#E8889A' : (Math.random() > 0.5 ? '#F5C6A0' : 'rgba(255,255,255,0.2)');
-        p.style.cssText = 'width:'+s+'px;height:'+s+'px;left:'+Math.random()*100+'%;top:'+(55+Math.random()*45)+'%;animation-delay:'+Math.random()*8+'s;animation-duration:'+(5+Math.random()*5)+'s;background:'+c;
-        box.appendChild(p);
-      }
-    })();
 
     // Typewriter names
     (function () {
