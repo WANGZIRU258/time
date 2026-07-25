@@ -977,42 +977,47 @@
       btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
     })();
 
-    // Music - fetch preload for guaranteed instant play
+    // Music - Web Audio API for guaranteed playback on user gesture
     (function () {
       var vinyl = document.getElementById('vinylPlayer');
-      var audioBlob = null;
-      var audio = null;
+      var audioCtx = null;
+      var audioBuffer = null;
+      var sourceNode = null;
       var playing = false;
 
-      // Preload: fetch the mp3 as blob, store it
-      fetch('music.mp3').then(function (r) { return r.blob(); }).then(function (blob) {
-        audioBlob = blob;
-      }).catch(function () {});
+      // Preload: decode audio into buffer
+      fetch('music.mp3').then(function (r) { return r.arrayBuffer(); }).then(function (buf) {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AC();
+        return audioCtx.decodeAudioData(buf);
+      }).then(function (decoded) {
+        audioBuffer = decoded;
+      }).catch(function (e) { console.log('Audio preload failed:', e); });
 
       window.__playMusic = function () {
         if (playing) return;
-        if (audioBlob) {
-          // Already preloaded as blob — instant play
-          audio = new Audio(URL.createObjectURL(audioBlob));
-          audio.loop = true;
-          audio.play().then(function () {
-            playing = true;
-            vinyl.classList.add('playing');
-          }).catch(function () {});
-        } else {
-          // Fallback: try direct
-          audio = new Audio('music.mp3');
-          audio.loop = true;
-          audio.play().then(function () {
-            playing = true;
-            vinyl.classList.add('playing');
-          }).catch(function () {});
+        if (!audioCtx) {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AC();
         }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        if (!audioBuffer) return; // not loaded yet
+
+        sourceNode = audioCtx.createBufferSource();
+        sourceNode.buffer = audioBuffer;
+        sourceNode.loop = true;
+        sourceNode.connect(audioCtx.destination);
+        sourceNode.start(0);
+        playing = true;
+        vinyl.classList.add('playing');
       };
 
       window.__stopMusic = function () {
-        if (!audio) return;
-        audio.pause();
+        if (!sourceNode) return;
+        sourceNode.stop();
+        sourceNode = null;
         playing = false;
         vinyl.classList.remove('playing');
       };
