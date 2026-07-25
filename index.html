@@ -469,15 +469,48 @@
     }
 
     /* ========== Footer ========== */
-    .footer { text-align: center; padding: 44px 20px 64px; }
-    .footer-line { width: 32px; height: 1px; background: var(--pink-light); margin: 0 auto 14px; }
+    .footer { text-align: center; padding: 44px 20px 20px; }
+    .footer-line { width: 1px; height: 28px; background: var(--pink-light); margin: 0 auto 14px; }
     .footer p { color: var(--pink); font-size: 10px; letter-spacing: 3px; font-weight: 400; opacity: 0.45; }
     .footer .footer-names {
       font-family: var(--serif); font-size: 16px; color: var(--text); margin-top: 8px;
       letter-spacing: 4px; font-weight: 500;
     }
     .footer .footer-heart { display: inline-block; color: var(--pink); font-size: 11px; margin: 0 4px; animation: heartBeat 1.5s ease-in-out infinite; }
-    .footer .footer-year { font-size: 10px; color: var(--pink); margin-top: 14px; letter-spacing: 2px; font-weight: 400; opacity: 0.3; }
+    .footer .footer-year { font-size: 10px; color: var(--pink); margin-top: 12px; letter-spacing: 2px; font-weight: 400; opacity: 0.3; }
+
+    /* Ending scene */
+    .ending { position: relative; height: 180px; overflow: hidden; }
+    .ending-drop {
+      position: absolute; left: 50%; top: 0; margin-left: -4px;
+      width: 8px; height: 12px; background: var(--pink-light);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      opacity: 0; animation: dropFall 3.5s ease-in infinite;
+    }
+    @keyframes dropFall {
+      0% { opacity: 0; transform: translateY(-10px); }
+      15% { opacity: 0.6; }
+      65% { opacity: 0.5; }
+      100% { opacity: 0; transform: translateY(110px); }
+    }
+    .ending-leaf {
+      position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
+      width: 48px; height: 34px; opacity: 0.4;
+    }
+    .ending-ripple {
+      position: absolute; bottom: 46px; left: 50%;
+      width: 0; height: 0; border-radius: 50%;
+      border: 1px solid var(--pink-light);
+      opacity: 0; animation: ripple 3.5s ease-out infinite;
+    }
+    @keyframes ripple {
+      0% { width: 0; height: 0; opacity: 0.4; transform: translateX(-50%); }
+      100% { width: 50px; height: 50px; opacity: 0; transform: translateX(-50%) translateY(-25px); }
+    }
+    .ending-text {
+      position: absolute; bottom: 12px; width: 100%;
+      font-size: 10px; color: var(--pink); letter-spacing: 4px; font-weight: 400; opacity: 0.35;
+    }
 
     /* ========== Progress ========== */
     .progress-bar {
@@ -625,6 +658,20 @@
       <div class="footer-names">刘宣富 <span class="footer-heart">&#10084;</span> 穆奕彤</div>
       <div class="footer-year">2025 - forever</div>
     </footer>
+
+    <div class="ending">
+      <div class="ending-drop"></div>
+      <div class="ending-ripple"></div>
+      <div class="ending-leaf">
+        <svg viewBox="0 0 48 34" fill="none">
+          <path d="M24 2C12 10 4 20 24 32C44 20 36 10 24 2Z" fill="rgba(184,201,163,0.4)" stroke="rgba(184,201,163,0.6)" stroke-width="1"/>
+          <path d="M24 12V32" stroke="rgba(184,201,163,0.5)" stroke-width="0.8"/>
+          <path d="M24 18L18 24" stroke="rgba(184,201,163,0.4)" stroke-width="0.6"/>
+          <path d="M24 22L30 26" stroke="rgba(184,201,163,0.4)" stroke-width="0.6"/>
+        </svg>
+      </div>
+      <div class="ending-text">TO BE CONTINUED ...</div>
+    </div>
   </div>
 
   <!-- Modal -->
@@ -991,27 +1038,63 @@
       btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
     })();
 
-    // Music
+    // Music - Web Audio API, decode on load, play on click
     (function () {
-      var audio = document.getElementById('bgMusic');
       var vinyl = document.getElementById('vinylPlayer');
+      var audioCtx = null;
+      var audioBuffer = null;
+      var sourceNode = null;
       var playing = false;
+
+      // Decode audio on page load
+      var AC = window.AudioContext || window.webkitAudioContext;
+
+      fetch('music.mp3').then(function (r) {
+        return r.arrayBuffer();
+      }).then(function (buf) {
+        audioCtx = new AC();
+        return audioCtx.decodeAudioData(buf);
+      }).then(function (decoded) {
+        audioBuffer = decoded;
+        // Auto-dismiss loading overlay
+        var overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+          overlay.classList.add('hide');
+          setTimeout(function () { overlay.style.display = 'none'; }, 600);
+        }
+      }).catch(function (e) {
+        console.log('Audio decode failed:', e);
+        // Fallback: dismiss overlay anyway
+        var overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+          overlay.classList.add('hide');
+          setTimeout(function () { overlay.style.display = 'none'; }, 600);
+        }
+      });
 
       window.__playMusic = function () {
         if (playing) return;
-        audio.play().then(function () {
-          playing = true;
-          vinyl.classList.add('playing');
-        }).catch(function () {});
+        if (!audioCtx) audioCtx = new AC();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        if (!audioBuffer) return;
+
+        sourceNode = audioCtx.createBufferSource();
+        sourceNode.buffer = audioBuffer;
+        sourceNode.loop = true;
+        sourceNode.connect(audioCtx.destination);
+        sourceNode.start(0);
+        playing = true;
+        vinyl.classList.add('playing');
       };
 
       window.__stopMusic = function () {
-        audio.pause();
+        if (sourceNode) {
+          try { sourceNode.stop(); } catch (e) {}
+          sourceNode = null;
+        }
         playing = false;
         vinyl.classList.remove('playing');
       };
-
-      window.__audioReady = function () { return audio.readyState >= 2; };
 
       vinyl.addEventListener('click', function (e) {
         e.preventDefault();
