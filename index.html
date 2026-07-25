@@ -307,7 +307,7 @@
       position: absolute; top: 0; left: 0;
       width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible;
     }
-    .vine-path { fill: none; stroke: var(--vine); stroke-width: 1.5; stroke-linecap: round; opacity: 0.4; }
+    .vine-path { fill: none; stroke: #C0A090; stroke-width: 2; stroke-linecap: round; opacity: 0.55; }
     .vine-leaf {
       position: absolute; width: 10px; height: 10px; z-index: 1;
       opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease;
@@ -357,20 +357,20 @@
     }
 
     .mem-dot {
-      position: absolute; top: 12px; width: 7px; height: 7px;
+      position: absolute; top: 12px; width: 8px; height: 8px;
       background: var(--pink); border-radius: 50%; z-index: 3;
       opacity: 0; transition: opacity 0.4s ease 0.2s;
-      box-shadow: 0 0 0 2px rgba(232,136,154,0.12);
+      box-shadow: 0 0 0 2px rgba(232,136,154,0.15);
     }
     .mem-card.visible ~ .mem-dot, .mem-dot.visible { opacity: 1; }
     .mem.left .mem-dot { right: -26px; }
     .mem.right .mem-dot { left: -26px; }
 
     .mem-stem {
-      position: absolute; top: 15px; height: 1px; background: var(--vine);
+      position: absolute; top: 15px; height: 1px; background: #C0A090;
       z-index: 1; opacity: 0; transition: opacity 0.4s ease 0.3s, width 0.4s ease 0.3s; width: 0;
     }
-    .mem-card.visible ~ .mem-stem, .mem-stem.visible { opacity: 0.3; width: 18px; }
+    .mem-card.visible ~ .mem-stem, .mem-stem.visible { opacity: 0.5; width: 20px; }
     .mem.left .mem-stem { right: -18px; }
     .mem.right .mem-stem { left: -18px; }
 
@@ -500,6 +500,7 @@
       </div>
       <div class="welcome-sub" id="welcomeSub" style="opacity:0">Our Love Story</div>
       <button class="welcome-btn" id="welcomeBtn">点击进入</button>
+      <div id="welcomeLoading" style="font-size:9px;color:#C8B0B0;margin-top:10px;letter-spacing:2px;opacity:0">音乐加载中...</div>
     </div>
     <div class="welcome-hint">请佩戴耳机获得最佳体验</div>
   </div>
@@ -693,10 +694,10 @@
       var el = document.getElementById('welcomeNames');
       var sub = document.getElementById('welcomeSub');
       var btn = document.getElementById('welcomeBtn');
+      var loading = document.getElementById('welcomeLoading');
       var full = '刘宣富 & 穆奕彤';
       var i = 0;
 
-      // Hide & button, show cursor
       el.innerHTML = '<span class="welcome-cursor"></span>';
 
       function type() {
@@ -710,11 +711,23 @@
           i++;
           setTimeout(type, ch === ' ' ? 180 : (ch === '&' ? 300 : 140));
         } else {
-          // Done typing — remove cursor, fade in sub + btn
           el.innerHTML = '刘宣富 <span class="welcome-amp">&amp;</span> 穆奕彤';
           sub.style.transition = 'opacity 0.6s ease';
           sub.style.opacity = '1';
-          setTimeout(function () { btn.classList.add('show'); }, 400);
+          setTimeout(function () {
+            btn.classList.add('show');
+            // Show loading hint if audio not ready
+            if (!window.__audioReady || !window.__audioReady()) {
+              loading.style.transition = 'opacity 0.4s ease';
+              loading.style.opacity = '1';
+              var checkReady = setInterval(function () {
+                if (window.__audioReady && window.__audioReady()) {
+                  loading.style.opacity = '0';
+                  clearInterval(checkReady);
+                }
+              }, 500);
+            }
+          }, 400);
         }
       }
 
@@ -977,50 +990,80 @@
       btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
     })();
 
-    // Music - Web Audio API for guaranteed playback on user gesture
+    // Music - Web Audio API with fallback
     (function () {
       var vinyl = document.getElementById('vinylPlayer');
       var audioCtx = null;
       var audioBuffer = null;
       var sourceNode = null;
       var playing = false;
+      var audioReady = false;
 
-      // Preload: decode audio into buffer
+      // Fallback: old Audio element
+      var fallbackAudio = null;
+
+      function tryDecode(arrayBuffer) {
+        try {
+          var AC = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AC();
+          return audioCtx.decodeAudioData(arrayBuffer).then(function (decoded) {
+            audioBuffer = decoded;
+            audioReady = true;
+          });
+        } catch (e) {
+          return Promise.reject(e);
+        }
+      }
+
+      function fallbackLoad(arrayBuffer) {
+        var blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+        fallbackAudio = new Audio(URL.createObjectURL(blob));
+        fallbackAudio.loop = true;
+        audioReady = true;
+      }
+
+      // Preload
       fetch('music.mp3').then(function (r) { return r.arrayBuffer(); }).then(function (buf) {
-        var AC = window.AudioContext || window.webkitAudioContext;
-        audioCtx = new AC();
-        return audioCtx.decodeAudioData(buf);
-      }).then(function (decoded) {
-        audioBuffer = decoded;
-      }).catch(function (e) { console.log('Audio preload failed:', e); });
+        return tryDecode(buf).catch(function () {
+          fallbackLoad(buf);
+        });
+      }).catch(function () {});
 
       window.__playMusic = function () {
         if (playing) return;
-        if (!audioCtx) {
-          var AC = window.AudioContext || window.webkitAudioContext;
-          audioCtx = new AC();
-        }
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
-        }
-        if (!audioBuffer) return; // not loaded yet
 
-        sourceNode = audioCtx.createBufferSource();
-        sourceNode.buffer = audioBuffer;
-        sourceNode.loop = true;
-        sourceNode.connect(audioCtx.destination);
-        sourceNode.start(0);
-        playing = true;
-        vinyl.classList.add('playing');
+        if (audioBuffer && audioCtx) {
+          // Web Audio API path
+          if (audioCtx.state === 'suspended') audioCtx.resume();
+          sourceNode = audioCtx.createBufferSource();
+          sourceNode.buffer = audioBuffer;
+          sourceNode.loop = true;
+          sourceNode.connect(audioCtx.destination);
+          sourceNode.start(0);
+          playing = true;
+          vinyl.classList.add('playing');
+        } else if (fallbackAudio) {
+          // Fallback Audio element path
+          fallbackAudio.play().then(function () {
+            playing = true;
+            vinyl.classList.add('playing');
+          }).catch(function () {});
+        }
       };
 
       window.__stopMusic = function () {
-        if (!sourceNode) return;
-        sourceNode.stop();
-        sourceNode = null;
+        if (sourceNode) {
+          sourceNode.stop();
+          sourceNode = null;
+        }
+        if (fallbackAudio) {
+          fallbackAudio.pause();
+        }
         playing = false;
         vinyl.classList.remove('playing');
       };
+
+      window.__audioReady = function () { return audioReady; };
 
       vinyl.addEventListener('click', function (e) {
         e.preventDefault();
