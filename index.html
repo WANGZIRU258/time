@@ -51,6 +51,54 @@
     }
     .welcome.hide { opacity: 0; transform: scale(1.03); pointer-events: none; }
 
+    /* Photo strip */
+    .welcome-photos {
+      position: absolute; inset: 0; z-index: 0;
+      display: flex; align-items: center; overflow: hidden;
+      opacity: 0.15;
+    }
+    .welcome-photos-track {
+      display: flex; gap: 16px;
+      animation: scrollPhotos 30s linear infinite;
+      will-change: transform;
+    }
+    .welcome-photos-track:hover { animation-play-state: paused; }
+
+    @keyframes scrollPhotos {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .welcome-photo {
+      flex-shrink: 0;
+      width: 180px; height: 130px;
+      border-radius: 10px; overflow: hidden;
+      background: #F5EEEA;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    }
+    .welcome-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .welcome-photo-ph {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; color: #D4C0B8;
+    }
+
+    /* Second row, opposite direction */
+    .welcome-photos.row2 {
+      top: auto; bottom: 8%; opacity: 0.1;
+    }
+    .welcome-photos.row2 .welcome-photos-track {
+      animation-direction: reverse;
+      animation-duration: 35s;
+    }
+
+    .welcome-photos.row3 {
+      top: 10%; opacity: 0.08;
+    }
+    .welcome-photos.row3 .welcome-photos-track {
+      animation-duration: 40s;
+    }
+
     .welcome-content { position: relative; z-index: 3; text-align: center; }
 
     .welcome-heart {
@@ -461,6 +509,11 @@
 
   <!-- Welcome -->
   <div class="welcome" id="welcome">
+    <!-- Photo rows -->
+    <div class="welcome-photos" id="wp1"></div>
+    <div class="welcome-photos row2" id="wp2"></div>
+    <div class="welcome-photos row3" id="wp3"></div>
+
     <div class="welcome-content">
       <div class="welcome-heart">&#10084;</div>
       <div class="welcome-names-wrap">
@@ -566,6 +619,42 @@
 
   <script>
     var START_DATE = new Date('2025-10-21');
+
+    // Welcome photo strips
+    (function () {
+      // 把你的照片路径放到这里，支持任意数量
+      // 格式: 'images/xxx.jpg'，留空 '' 则显示占位符
+      var photos = [
+        '', '', '', '', '', '', '', '',
+        '', '', '', '', '', '', '', ''
+      ];
+
+      function buildRow(containerId, photoList) {
+        var container = document.getElementById(containerId);
+        if (!container) return;
+        var track = document.createElement('div');
+        track.className = 'welcome-photos-track';
+
+        // Build items twice for seamless loop
+        var items = photoList.concat(photoList);
+        items.forEach(function (src) {
+          var div = document.createElement('div');
+          div.className = 'welcome-photo';
+          if (src) {
+            div.innerHTML = '<img src="' + src + '" loading="lazy">';
+          } else {
+            div.innerHTML = '<div class="welcome-photo-ph">&#128247;</div>';
+          }
+          track.appendChild(div);
+        });
+
+        container.appendChild(track);
+      }
+
+      buildRow('wp1', photos);
+      buildRow('wp2', photos.slice().reverse());
+      buildRow('wp3', photos.slice(4).concat(photos.slice(0, 4)));
+    })();
 
     // Typewriter names
     (function () {
