@@ -51,52 +51,57 @@
     }
     .welcome.hide { opacity: 0; transform: scale(1.03); pointer-events: none; }
 
-    /* Photo strip */
-    .welcome-photos {
+    /* Photo vortex */
+    .welcome-vortex {
       position: absolute; inset: 0; z-index: 0;
-      display: flex; align-items: center; overflow: hidden;
-      opacity: 0.25;
-    }
-    .welcome-photos-track {
-      display: flex; gap: 16px;
-      animation: scrollPhotos 30s linear infinite;
-      will-change: transform;
-    }
-    .welcome-photos-track:hover { animation-play-state: paused; }
-
-    @keyframes scrollPhotos {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; pointer-events: none;
+      perspective: 900px;
     }
 
-    .welcome-photo {
-      flex-shrink: 0;
-      width: 180px; height: 130px;
-      border-radius: 10px; overflow: hidden;
-      background: #F5EEEA;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+    .vortex-stage {
+      position: relative;
+      width: 300px; height: 300px;
+      transform-style: preserve-3d;
     }
-    .welcome-photo img { width: 100%; height: 100%; object-fit: cover; }
-    .welcome-photo-ph {
+
+    .vortex-ring {
+      position: absolute; inset: 0;
+      transform-style: preserve-3d;
+    }
+
+    .vortex-ring.spin1 { animation: ringRotate 18s linear infinite; }
+    .vortex-ring.spin2 { animation: ringRotate 25s linear infinite reverse; }
+    .vortex-ring.spin3 { animation: ringRotate 32s linear infinite; }
+
+    @keyframes ringRotate {
+      from { transform: rotateY(0deg); }
+      to { transform: rotateY(360deg); }
+    }
+
+    .vortex-card {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 100px; height: 70px;
+      margin: -35px 0 0 -50px;
+      border-radius: 8px; overflow: hidden;
+      background: rgba(240,232,228,0.8);
+      box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+      backface-visibility: hidden;
+    }
+    .vortex-card img { width: 100%; height: 100%; object-fit: cover; }
+    .vortex-card-ph {
       width: 100%; height: 100%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 24px; color: #D4C0B8;
+      font-size: 16px; color: #D4C0B8;
     }
 
-    /* Second row, opposite direction */
-    .welcome-photos.row2 {
-      top: auto; bottom: 8%; opacity: 0.18;
-    }
-    .welcome-photos.row2 .welcome-photos-track {
-      animation-direction: reverse;
-      animation-duration: 35s;
-    }
-
-    .welcome-photos.row3 {
-      top: 10%; opacity: 0.12;
-    }
-    .welcome-photos.row3 .welcome-photos-track {
-      animation-duration: 40s;
+    /* Center glow */
+    .vortex-glow {
+      position: absolute;
+      width: 200px; height: 200px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,115,139,0.08) 0%, transparent 70%);
+      pointer-events: none; z-index: 1;
     }
 
     .welcome-content { position: relative; z-index: 3; text-align: center; }
@@ -509,10 +514,11 @@
 
   <!-- Welcome -->
   <div class="welcome" id="welcome">
-    <!-- Photo rows -->
-    <div class="welcome-photos" id="wp1"></div>
-    <div class="welcome-photos row2" id="wp2"></div>
-    <div class="welcome-photos row3" id="wp3"></div>
+    <!-- Photo vortex -->
+    <div class="welcome-vortex" id="vortex">
+      <div class="vortex-stage" id="vortexStage"></div>
+      <div class="vortex-glow"></div>
+    </div>
 
     <div class="welcome-content">
       <div class="welcome-heart">&#10084;</div>
@@ -620,10 +626,8 @@
   <script>
     var START_DATE = new Date('2025-10-21');
 
-    // Welcome photo strips
+    // Welcome photo vortex
     (function () {
-      // 把你的照片路径放到这里，支持任意数量
-      // 格式: 'images/xxx.jpg'，留空 '' 则显示占位符
       var photos = [
         'images/couple.jpg',
         'images/photo202607251603093766.jpg',
@@ -636,31 +640,41 @@
         'images/photo202607251607484966.jpg'
       ];
 
-      function buildRow(containerId, photoList) {
-        var container = document.getElementById(containerId);
-        if (!container) return;
-        var track = document.createElement('div');
-        track.className = 'welcome-photos-track';
+      var stage = document.getElementById('vortexStage');
+      if (!stage) return;
 
-        // Build items twice for seamless loop
-        var items = photoList.concat(photoList);
-        items.forEach(function (src) {
-          var div = document.createElement('div');
-          div.className = 'welcome-photo';
-          if (src) {
-            div.innerHTML = '<img src="' + src + '" loading="lazy">';
+      // 3 rings, each with photos placed in a circle using 3D transforms
+      var rings = [
+        { cls: 'spin1', count: Math.min(photos.length, 6), radius: 180, y: 0, opacity: 0.5 },
+        { cls: 'spin2', count: Math.min(photos.length, 5), radius: 260, y: 20, opacity: 0.3 },
+        { cls: 'spin3', count: Math.min(photos.length, 4), radius: 340, y: -10, opacity: 0.15 }
+      ];
+
+      rings.forEach(function (ring, ri) {
+        var el = document.createElement('div');
+        el.className = 'vortex-ring ' + ring.cls;
+        el.style.opacity = ring.opacity;
+
+        var angleStep = 360 / ring.count;
+        for (var i = 0; i < ring.count; i++) {
+          var angle = angleStep * i;
+          var photoIdx = (i + ri * 2) % photos.length;
+          var card = document.createElement('div');
+          card.className = 'vortex-card';
+          // Position in 3D circle: rotateY then translateZ
+          card.style.transform = 'rotateY(' + angle + 'deg) translateZ(' + ring.radius + 'px)';
+          card.style.top = 'calc(50% + ' + ring.y + 'px)';
+
+          if (photos[photoIdx]) {
+            card.innerHTML = '<img src="' + photos[photoIdx] + '" loading="lazy">';
           } else {
-            div.innerHTML = '<div class="welcome-photo-ph">&#128247;</div>';
+            card.innerHTML = '<div class="vortex-card-ph">&#128247;</div>';
           }
-          track.appendChild(div);
-        });
+          el.appendChild(card);
+        }
 
-        container.appendChild(track);
-      }
-
-      buildRow('wp1', photos);
-      buildRow('wp2', photos.slice().reverse());
-      buildRow('wp3', photos.slice(4).concat(photos.slice(0, 4)));
+        stage.appendChild(el);
+      });
     })();
 
     // Typewriter names
