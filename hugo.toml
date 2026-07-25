@@ -1,8 +1,0 @@
-baseURL = 'https://atomgit.com/wangziru258/'
-locale = 'zh-cn'
-title = '刘宣富 & 穆奕彤'
-theme = 'ananke'
-
-[params]
-  author = 'wangziru258'
-  description = '我们的故事'
