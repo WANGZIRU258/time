@@ -1,0 +1,23 @@
+[
+  {
+    "date": "2025 / 10 / 21",
+    "title": "第一次认识",
+    "text": "在这里写你们认识的故事...",
+    "img": "",
+    "highlight": true
+  },
+  {
+    "date": "2026 / 03 / 07",
+    "title": "在一起了",
+    "text": "在这里写表白的故事...",
+    "img": "",
+    "highlight": true
+  },
+  {
+    "date": "在这里填日期",
+    "title": "回忆标题",
+    "text": "在这里写你们的故事...",
+    "img": "",
+    "highlight": false
+  }
+]

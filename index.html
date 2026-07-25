@@ -331,7 +331,7 @@
 <body>
 
   <audio id="bgMusic" loop preload="auto">
-    <source src="https://raw.githubusercontent.com/WANGZIRU258/time/main/music.mp3" type="audio/mpeg">
+    <source src="music.mp3" type="audio/mpeg">
   </audio>
 
   <div class="vinyl" id="vinylPlayer">
@@ -379,51 +379,11 @@
 
   <!-- Vine Timeline -->
   <section class="vine-section" id="vineSection">
-    <!-- SVG 藤蔓 — JS 动态绘制 -->
     <svg class="vine-svg" id="vineSvg" preserveAspectRatio="none">
       <path class="vine-path" id="vinePath" d=""></path>
     </svg>
-
-    <!-- 小叶子装饰 — JS 动态生成 -->
     <div id="vineLeaves"></div>
-
-    <!-- 记忆 1 -->
-    <div class="mem left" data-vine>
-      <div class="mem-card highlight">
-        <div class="mem-date">2025 / 10 / 21</div>
-        <div class="mem-title">第一次认识</div>
-        <div class="mem-text">在这里写你们认识的故事...</div>
-        <div class="mem-img-ph">📷</div>
-      </div>
-      <div class="mem-dot"></div>
-      <div class="mem-stem"></div>
-    </div>
-
-    <!-- 记忆 2 -->
-    <div class="mem right" data-vine>
-      <div class="mem-card highlight">
-        <div class="mem-date">2026 / 03 / 07</div>
-        <div class="mem-title">在一起了</div>
-        <div class="mem-text">在这里写表白的故事...</div>
-        <div class="mem-img-ph">📷</div>
-      </div>
-      <div class="mem-dot"></div>
-      <div class="mem-stem"></div>
-    </div>
-
-    <!-- 记忆 3 -->
-    <div class="mem left" data-vine>
-      <div class="mem-card">
-        <div class="mem-date">在这里填日期</div>
-        <div class="mem-title">回忆标题</div>
-        <div class="mem-text">在这里写你们的故事...</div>
-        <div class="mem-img-ph">📷</div>
-      </div>
-      <div class="mem-dot"></div>
-      <div class="mem-stem"></div>
-    </div>
-
-    <!-- 在这里粘贴更多回忆 -->
+    <div id="memories"></div>
   </section>
 
   <footer class="footer">
@@ -456,44 +416,75 @@
       var svg = document.getElementById('vineSvg');
       var path = document.getElementById('vinePath');
       var leavesBox = document.getElementById('vineLeaves');
-      var items = document.querySelectorAll('.mem');
+      var container = document.getElementById('memories');
       var isMobile = window.innerWidth <= 640;
 
-      // 生成丝滑藤蔓路径 — 多采样点 + 正弦波
+      // 从 data.json 加载记忆并生成卡片
+      function loadMemories(data) {
+        container.innerHTML = '';
+        data.forEach(function (item, i) {
+          var side = i % 2 === 0 ? 'left' : 'right';
+          var hl = item.highlight ? ' highlight' : '';
+          var imgHtml = item.img
+            ? '<div class="mem-img"><img src="' + item.img + '" alt="' + item.title + '" loading="lazy"></div>'
+            : '<div class="mem-img-ph">📷</div>';
+          var html = '<div class="mem ' + side + '" data-vine>'
+            + '<div class="mem-card' + hl + '">'
+            + '<div class="mem-date">' + item.date + '</div>'
+            + '<div class="mem-title">' + item.title + '</div>'
+            + '<div class="mem-text">' + item.text + '</div>'
+            + imgHtml
+            + '</div>'
+            + '<div class="mem-dot"></div>'
+            + '<div class="mem-stem"></div>'
+            + '</div>';
+          container.insertAdjacentHTML('beforeend', html);
+        });
+      }
+
+      // 加载 data.json
+      fetch('data.json')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          loadMemories(data);
+          buildLeaves();
+          initVine();
+        })
+        .catch(function () {
+          container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">加载中...</p>';
+        });
+
       function buildPath() {
+        var items = document.querySelectorAll('.mem');
         var w = section.offsetWidth;
         var h = section.offsetHeight;
         var cx = isMobile ? 28 : w / 2;
         var count = items.length;
         var segH = h / Math.max(count, 1);
         var points = [];
-        var steps = 60; // 采样密度
+        var steps = 60;
 
         for (var i = 0; i <= steps; i++) {
           var t = i / steps;
           var y = t * h;
-          // 正弦波：每个记忆一个周期，振幅逐渐增大再收回来
           var waveAmp = isMobile ? 0 : 20 + Math.sin(t * Math.PI) * 10;
           var x = cx + Math.sin(t * count * Math.PI) * waveAmp;
           points.push({ x: x, y: y });
         }
 
-        // 用 catmull-rom 转 cubic bezier，曲线更丝滑
         var d = 'M ' + points[0].x.toFixed(1) + ' ' + points[0].y.toFixed(1);
         for (var j = 0; j < points.length - 1; j++) {
           var p0 = points[Math.max(0, j - 1)];
           var p1 = points[j];
           var p2 = points[j + 1];
           var p3 = points[Math.min(points.length - 1, j + 2)];
-
           var cp1x = p1.x + (p2.x - p0.x) / 6;
           var cp1y = p1.y + (p2.y - p0.y) / 6;
           var cp2x = p2.x - (p3.x - p1.x) / 6;
           var cp2y = p2.y - (p3.y - p1.y) / 6;
-
-          d += ' C ' + cp1x.toFixed(1) + ' ' + cp1y.toFixed(1) +
-               ', ' + cp2x.toFixed(1) + ' ' + cp2y.toFixed(1) +
-               ', ' + p2.x.toFixed(1) + ' ' + p2.y.toFixed(1);
+          d += ' C ' + cp1x.toFixed(1) + ' ' + cp1y.toFixed(1)
+            + ', ' + cp2x.toFixed(1) + ' ' + cp2y.toFixed(1)
+            + ', ' + p2.x.toFixed(1) + ' ' + p2.y.toFixed(1);
         }
 
         path.setAttribute('d', d);
@@ -503,11 +494,11 @@
         return len;
       }
 
-      var totalLen = buildPath();
+      var totalLen = 0;
 
-      // 生成叶子
       function buildLeaves() {
         leavesBox.innerHTML = '';
+        var items = document.querySelectorAll('.mem');
         var w = section.offsetWidth;
         var cx = isMobile ? 28 : w / 2;
         var h = section.offsetHeight;
@@ -526,43 +517,43 @@
         }
       }
 
-      buildLeaves();
+      function initVine() {
+        totalLen = buildPath();
+        var memCards = document.querySelectorAll('.mem-card');
+        var memDots = document.querySelectorAll('.mem-dot');
+        var memStems = document.querySelectorAll('.mem-stem');
+        var leafEls = document.querySelectorAll('.vine-leaf');
 
-      // 滚动：藤蔓生长 + 卡片出现 + 叶子出现
-      var memCards = document.querySelectorAll('.mem-card');
-      var memDots = document.querySelectorAll('.mem-dot');
-      var memStems = document.querySelectorAll('.mem-stem');
-      var leafEls = document.querySelectorAll('.vine-leaf');
+        function onScroll() {
+          var rect = section.getBoundingClientRect();
+          var viewH = window.innerHeight;
+          var scrolled = Math.max(0, -rect.top + viewH * 0.6);
+          var total = rect.height;
+          var progress = Math.min(scrolled / total, 1);
+          path.style.strokeDashoffset = totalLen * (1 - progress);
 
-      function onScroll() {
-        var rect = section.getBoundingClientRect();
-        var viewH = window.innerHeight;
-        // 藤蔓生长
-        var scrolled = Math.max(0, -rect.top + viewH * 0.6);
-        var total = rect.height;
-        var progress = Math.min(scrolled / total, 1);
-        path.style.strokeDashoffset = totalLen * (1 - progress);
+          document.querySelectorAll('.mem').forEach(function (item, i) {
+            var r = item.getBoundingClientRect();
+            if (r.top < viewH * 0.82) {
+              if (memCards[i]) memCards[i].classList.add('visible');
+              if (memDots[i]) memDots[i].classList.add('visible');
+              if (memStems[i]) memStems[i].classList.add('visible');
+              if (leafEls[i]) leafEls[i].classList.add('visible');
+            }
+          });
+        }
 
-        // 卡片、点、茎、叶子
-        items.forEach(function (item, i) {
-          var r = item.getBoundingClientRect();
-          if (r.top < viewH * 0.82) {
-            memCards[i].classList.add('visible');
-            memDots[i].classList.add('visible');
-            memStems[i].classList.add('visible');
-            if (leafEls[i]) leafEls[i].classList.add('visible');
-          }
-        });
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
       }
 
-      window.addEventListener('scroll', onScroll, { passive: true });
       window.addEventListener('resize', function () {
         isMobile = window.innerWidth <= 640;
-        totalLen = buildPath();
-        buildLeaves();
-        onScroll();
+        if (totalLen > 0) {
+          totalLen = buildPath();
+          buildLeaves();
+        }
       });
-      onScroll();
     })();
 
     // 音乐
