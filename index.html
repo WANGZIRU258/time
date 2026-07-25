@@ -479,38 +479,63 @@
     .footer .footer-heart { display: inline-block; color: var(--pink); font-size: 11px; margin: 0 4px; animation: heartBeat 1.5s ease-in-out infinite; }
     .footer .footer-year { font-size: 10px; color: var(--pink); margin-top: 12px; letter-spacing: 2px; font-weight: 400; opacity: 0.3; }
 
-    /* Ending scene */
-    .ending { position: relative; height: 180px; overflow: hidden; }
+    /* Ending tree scene */
+    .ending { position: relative; height: 280px; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 20px; }
+
+    .tree-wrap {
+      position: relative; cursor: pointer; transition: transform 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tree-wrap:active { transform: scale(0.96); }
+    .tree-wrap svg { width: 160px; height: 200px; }
+
+    .tree-hint {
+      position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%);
+      font-size: 10px; color: var(--pink); letter-spacing: 2px; opacity: 0.35;
+      white-space: nowrap; animation: hintPulse 2.5s ease-in-out infinite;
+    }
+    @keyframes hintPulse { 0%,100% { opacity: 0.25; } 50% { opacity: 0.55; } }
+
     .ending-drop {
-      position: absolute; left: 50%; top: 0; margin-left: -4px;
-      width: 8px; height: 12px; background: var(--pink-light);
+      position: absolute; left: 50%; top: 0; margin-left: -3px;
+      width: 6px; height: 10px; background: #B8D4E8;
       border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-      opacity: 0; animation: dropFall 3.5s ease-in infinite;
+      opacity: 0; animation: dropFall 3s ease-in infinite;
     }
     @keyframes dropFall {
       0% { opacity: 0; transform: translateY(-10px); }
-      15% { opacity: 0.6; }
+      15% { opacity: 0.7; }
       65% { opacity: 0.5; }
-      100% { opacity: 0; transform: translateY(110px); }
+      100% { opacity: 0; transform: translateY(160px); }
     }
-    .ending-leaf {
-      position: absolute; bottom: 50px; left: 50%; transform: translateX(-50%);
-      width: 48px; height: 34px; opacity: 0.4;
+
+    /* Fireworks */
+    .fireworks-canvas {
+      position: fixed; inset: 0; z-index: 10002;
+      pointer-events: none; display: none;
     }
-    .ending-ripple {
-      position: absolute; bottom: 46px; left: 50%;
-      width: 0; height: 0; border-radius: 50%;
-      border: 1px solid var(--pink-light);
-      opacity: 0; animation: ripple 3.5s ease-out infinite;
+
+    /* Final black screen */
+    .final-screen {
+      position: fixed; inset: 0; z-index: 10003;
+      background: #0A0A0A;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 1.2s ease;
     }
-    @keyframes ripple {
-      0% { width: 0; height: 0; opacity: 0.4; transform: translateX(-50%); }
-      100% { width: 50px; height: 50px; opacity: 0; transform: translateX(-50%) translateY(-25px); }
+    .final-screen.show { opacity: 1; pointer-events: auto; }
+    .final-text {
+      font-family: var(--serif);
+      font-size: clamp(18px, 5vw, 26px); color: rgba(255,255,255,0.9);
+      letter-spacing: 4px; font-weight: 400; text-align: center;
+      line-height: 2.2; opacity: 0; transform: translateY(12px);
+      transition: opacity 1.5s ease 0.8s, transform 1.5s ease 0.8s;
     }
-    .ending-text {
-      position: absolute; bottom: 12px; width: 100%;
-      font-size: 10px; color: var(--pink); letter-spacing: 4px; font-weight: 400; opacity: 0.35;
+    .final-screen.show .final-text { opacity: 1; transform: translateY(0); }
+    .final-heart {
+      display: block; margin: 20px auto 0; font-size: 18px; opacity: 0;
+      transition: opacity 1s ease 2.5s;
     }
+    .final-screen.show .final-heart { opacity: 0.5; animation: heartBeat 1.5s ease-in-out 2.5s infinite; }
 
     /* ========== Progress ========== */
     .progress-bar {
@@ -661,16 +686,38 @@
 
     <div class="ending">
       <div class="ending-drop"></div>
-      <div class="ending-ripple"></div>
-      <div class="ending-leaf">
-        <svg viewBox="0 0 48 34" fill="none">
-          <path d="M24 2C12 10 4 20 24 32C44 20 36 10 24 2Z" fill="rgba(184,201,163,0.4)" stroke="rgba(184,201,163,0.6)" stroke-width="1"/>
-          <path d="M24 12V32" stroke="rgba(184,201,163,0.5)" stroke-width="0.8"/>
-          <path d="M24 18L18 24" stroke="rgba(184,201,163,0.4)" stroke-width="0.6"/>
-          <path d="M24 22L30 26" stroke="rgba(184,201,163,0.4)" stroke-width="0.6"/>
+      <div class="tree-wrap" id="treeWrap">
+        <svg viewBox="0 0 160 200" fill="none">
+          <!-- Trunk -->
+          <rect x="72" y="130" width="16" height="60" rx="4" fill="#8B6F4A"/>
+          <rect x="75" y="135" width="4" height="50" rx="2" fill="#A0845C" opacity="0.5"/>
+          <!-- Crown layers -->
+          <ellipse cx="80" cy="95" rx="50" ry="45" fill="#6B8E5A" opacity="0.7"/>
+          <ellipse cx="68" cy="85" rx="35" ry="32" fill="#7DA068" opacity="0.8"/>
+          <ellipse cx="95" cy="88" rx="30" ry="28" fill="#8AB475" opacity="0.7"/>
+          <ellipse cx="80" cy="75" rx="28" ry="25" fill="#9AC485" opacity="0.8"/>
+          <!-- Fruits -->
+          <circle cx="60" cy="90" r="5" fill="#E8889A" opacity="0.8"/>
+          <circle cx="95" cy="80" r="4" fill="#E8889A" opacity="0.7"/>
+          <circle cx="75" cy="70" r="5" fill="#D4738B" opacity="0.8"/>
+          <circle cx="100" cy="95" r="4" fill="#E8889A" opacity="0.6"/>
+          <circle cx="65" cy="75" r="3.5" fill="#D4738B" opacity="0.7"/>
+          <!-- Highlights -->
+          <circle cx="60" cy="89" r="1.5" fill="white" opacity="0.3"/>
+          <circle cx="75" cy="69" r="1.5" fill="white" opacity="0.3"/>
+          <circle cx="95" cy="79" r="1.2" fill="white" opacity="0.25"/>
         </svg>
+        <div class="tree-hint" id="treeHint">点击许愿树</div>
       </div>
-      <div class="ending-text">TO BE CONTINUED ...</div>
+    </div>
+
+    <canvas class="fireworks-canvas" id="fireworksCanvas"></canvas>
+
+    <div class="final-screen" id="finalScreen">
+      <div>
+        <div class="final-text">祝你永远开心<br>奕彤</div>
+        <div class="final-heart">&#10084;</div>
+      </div>
     </div>
   </div>
 
@@ -1036,6 +1083,124 @@
       var btn = document.getElementById('backTop');
       window.addEventListener('scroll', function () { btn.classList.toggle('show', window.scrollY > 400); }, { passive: true });
       btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    })();
+
+    // Tree click + fireworks + final screen
+    (function () {
+      var tree = document.getElementById('treeWrap');
+      var hint = document.getElementById('treeHint');
+      var canvas = document.getElementById('fireworksCanvas');
+      var ctx = canvas.getContext('2d');
+      var finalScreen = document.getElementById('finalScreen');
+      var clickCount = 0;
+      var fireworksStarted = false;
+
+      tree.addEventListener('click', function () {
+        if (fireworksStarted) return;
+        clickCount++;
+        // Shake tree
+        tree.style.transform = 'rotate(' + (Math.random() * 4 - 2) + 'deg)';
+        setTimeout(function () { tree.style.transform = ''; }, 150);
+
+        if (clickCount >= 3) {
+          fireworksStarted = true;
+          hint.style.opacity = '0';
+          startFireworks();
+        }
+      });
+
+      function startFireworks() {
+        canvas.style.display = 'block';
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        var particles = [];
+        var colors = ['#E8889A','#D4738B','#F5C6A0','#C9A96E','#B8C9A3','#fff','#FFB6C1','#FF69B4'];
+        var fireworkCount = 0;
+        var maxFireworks = 12;
+
+        function createFirework() {
+          var x = Math.random() * canvas.width;
+          var y = canvas.height;
+          var targetY = Math.random() * canvas.height * 0.5;
+          var color = colors[Math.floor(Math.random() * colors.length)];
+          return {
+            x: x, y: y, targetY: targetY, color: color,
+            speed: 3 + Math.random() * 2, exploded: false,
+            particles: []
+          };
+        }
+
+        function explode(fw) {
+          for (var i = 0; i < 40; i++) {
+            var angle = (Math.PI * 2 * i) / 40;
+            var speed = 1 + Math.random() * 3;
+            fw.particles.push({
+              x: fw.x, y: fw.targetY,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed,
+              life: 1, color: fw.color,
+              size: 1.5 + Math.random() * 1.5
+            });
+          }
+        }
+
+        function loop() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Launch new fireworks
+          if (fireworkCount < maxFireworks && Math.random() < 0.06) {
+            particles.push(createFirework());
+            fireworkCount++;
+          }
+
+          // Update
+          for (var i = particles.length - 1; i >= 0; i--) {
+            var p = particles[i];
+            if (!p.exploded) {
+              p.y -= p.speed;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+              ctx.fillStyle = p.color;
+              ctx.fill();
+              if (p.y <= p.targetY) {
+                p.exploded = true;
+                explode(p);
+              }
+            } else {
+              var allDead = true;
+              p.particles.forEach(function (pt) {
+                pt.x += pt.vx;
+                pt.y += pt.vy;
+                pt.vy += 0.04; // gravity
+                pt.life -= 0.015;
+                if (pt.life > 0) {
+                  allDead = false;
+                  ctx.beginPath();
+                  ctx.arc(pt.x, pt.y, pt.size * pt.life, 0, Math.PI * 2);
+                  ctx.fillStyle = pt.color;
+                  ctx.globalAlpha = pt.life;
+                  ctx.fill();
+                  ctx.globalAlpha = 1;
+                }
+              });
+              if (allDead) particles.splice(i, 1);
+            }
+          }
+
+          if (particles.length > 0 || fireworkCount < maxFireworks) {
+            requestAnimationFrame(loop);
+          } else {
+            // Fireworks done, show final screen
+            setTimeout(function () {
+              canvas.style.display = 'none';
+              finalScreen.classList.add('show');
+            }, 800);
+          }
+        }
+
+        loop();
+      }
     })();
 
     // Music - Web Audio API, decode on load, play on click
