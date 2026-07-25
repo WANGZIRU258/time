@@ -485,6 +485,7 @@
 </head>
 <body>
 
+  <audio id="bgMusic" loop preload="auto" src="music.mp3"></audio>
   <div class="progress-bar" id="progressBar"></div>
 
   <!-- Welcome -->
@@ -500,7 +501,6 @@
       </div>
       <div class="welcome-sub" id="welcomeSub" style="opacity:0">Our Love Story</div>
       <button class="welcome-btn" id="welcomeBtn">点击进入</button>
-      <div id="welcomeLoading" style="font-size:9px;color:#C8B0B0;margin-top:10px;letter-spacing:2px;opacity:0">音乐加载中...</div>
     </div>
     <div class="welcome-hint">请佩戴耳机获得最佳体验</div>
   </div>
@@ -694,7 +694,6 @@
       var el = document.getElementById('welcomeNames');
       var sub = document.getElementById('welcomeSub');
       var btn = document.getElementById('welcomeBtn');
-      var loading = document.getElementById('welcomeLoading');
       var full = '刘宣富 & 穆奕彤';
       var i = 0;
 
@@ -714,20 +713,7 @@
           el.innerHTML = '刘宣富 <span class="welcome-amp">&amp;</span> 穆奕彤';
           sub.style.transition = 'opacity 0.6s ease';
           sub.style.opacity = '1';
-          setTimeout(function () {
-            btn.classList.add('show');
-            // Show loading hint if audio not ready
-            if (!window.__audioReady || !window.__audioReady()) {
-              loading.style.transition = 'opacity 0.4s ease';
-              loading.style.opacity = '1';
-              var checkReady = setInterval(function () {
-                if (window.__audioReady && window.__audioReady()) {
-                  loading.style.opacity = '0';
-                  clearInterval(checkReady);
-                }
-              }, 500);
-            }
-          }, 400);
+          setTimeout(function () { btn.classList.add('show'); }, 400);
         }
       }
 
@@ -990,80 +976,27 @@
       btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
     })();
 
-    // Music - Web Audio API with fallback
+    // Music
     (function () {
+      var audio = document.getElementById('bgMusic');
       var vinyl = document.getElementById('vinylPlayer');
-      var audioCtx = null;
-      var audioBuffer = null;
-      var sourceNode = null;
       var playing = false;
-      var audioReady = false;
-
-      // Fallback: old Audio element
-      var fallbackAudio = null;
-
-      function tryDecode(arrayBuffer) {
-        try {
-          var AC = window.AudioContext || window.webkitAudioContext;
-          audioCtx = new AC();
-          return audioCtx.decodeAudioData(arrayBuffer).then(function (decoded) {
-            audioBuffer = decoded;
-            audioReady = true;
-          });
-        } catch (e) {
-          return Promise.reject(e);
-        }
-      }
-
-      function fallbackLoad(arrayBuffer) {
-        var blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
-        fallbackAudio = new Audio(URL.createObjectURL(blob));
-        fallbackAudio.loop = true;
-        audioReady = true;
-      }
-
-      // Preload
-      fetch('music.mp3').then(function (r) { return r.arrayBuffer(); }).then(function (buf) {
-        return tryDecode(buf).catch(function () {
-          fallbackLoad(buf);
-        });
-      }).catch(function () {});
 
       window.__playMusic = function () {
         if (playing) return;
-
-        if (audioBuffer && audioCtx) {
-          // Web Audio API path
-          if (audioCtx.state === 'suspended') audioCtx.resume();
-          sourceNode = audioCtx.createBufferSource();
-          sourceNode.buffer = audioBuffer;
-          sourceNode.loop = true;
-          sourceNode.connect(audioCtx.destination);
-          sourceNode.start(0);
+        audio.play().then(function () {
           playing = true;
           vinyl.classList.add('playing');
-        } else if (fallbackAudio) {
-          // Fallback Audio element path
-          fallbackAudio.play().then(function () {
-            playing = true;
-            vinyl.classList.add('playing');
-          }).catch(function () {});
-        }
+        }).catch(function () {});
       };
 
       window.__stopMusic = function () {
-        if (sourceNode) {
-          sourceNode.stop();
-          sourceNode = null;
-        }
-        if (fallbackAudio) {
-          fallbackAudio.pause();
-        }
+        audio.pause();
         playing = false;
         vinyl.classList.remove('playing');
       };
 
-      window.__audioReady = function () { return audioReady; };
+      window.__audioReady = function () { return audio.readyState >= 2; };
 
       vinyl.addEventListener('click', function (e) {
         e.preventDefault();
