@@ -303,20 +303,21 @@
 
     /* ========== Timeline ========== */
     .vine-section { position: relative; max-width: 660px; margin: 0 auto; padding: 0 0 60px; }
-    .vine-svg {
-      position: absolute; top: 0; left: 0;
-      width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible;
+
+    /* Center vine line */
+    .vine-line {
+      position: absolute; top: 0; left: 50%; width: 2px; height: 0;
+      background: linear-gradient(180deg, transparent, #D4BFB3 10%, #D4BFB3 90%, transparent);
+      transform: translateX(-50%);
+      z-index: 0;
+      transition: height 0.1s linear;
     }
-    .vine-path { fill: none; stroke: #C0A090; stroke-width: 2; stroke-linecap: round; opacity: 0.55; }
-    .vine-leaf {
-      position: absolute; width: 10px; height: 10px; z-index: 1;
-      opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease;
-      transform: scale(0) rotate(-30deg);
-    }
-    .vine-leaf.visible { opacity: 0.3; transform: scale(1) rotate(0deg); }
 
     /* ========== Card ========== */
-    .mem { position: relative; z-index: 2; padding: 0 18px 44px; display: flex; align-items: flex-start; }
+    .mem {
+      position: relative; z-index: 2; padding: 0 18px 44px;
+      display: flex; align-items: flex-start;
+    }
     .mem.left { justify-content: flex-start; padding-right: 54%; }
     .mem.right { justify-content: flex-end; padding-left: 54%; }
 
@@ -327,9 +328,9 @@
       position: relative; cursor: pointer;
       box-shadow: 0 2px 10px rgba(232,136,154,0.04);
     }
-    .mem.left .mem-card { transform: translateX(-20px) scale(0.97); }
-    .mem.right .mem-card { transform: translateX(20px) scale(0.97); }
-    .mem-card.visible { opacity: 1; transform: translateX(0) scale(1); }
+    .mem.left .mem-card { transform: translateX(-30px); }
+    .mem.right .mem-card { transform: translateX(30px); }
+    .mem-card.visible { opacity: 1; transform: translateX(0); }
     .mem-card:hover { box-shadow: 0 6px 20px rgba(232,136,154,0.1); }
     .mem-card.highlight { border-color: rgba(232,136,154,0.15); }
     .mem-card.highlight::before {
@@ -356,23 +357,24 @@
       backdrop-filter: blur(4px); border: 1px solid rgba(232,136,154,0.1);
     }
 
+    /* Dot on the vine line */
     .mem-dot {
-      position: absolute; top: 12px; width: 8px; height: 8px;
+      position: absolute; top: 14px; width: 8px; height: 8px;
       background: var(--pink); border-radius: 50%; z-index: 3;
       opacity: 0; transition: opacity 0.4s ease 0.2s;
       box-shadow: 0 0 0 2px rgba(232,136,154,0.15);
+      left: 50%; transform: translateX(-50%);
     }
     .mem-card.visible ~ .mem-dot, .mem-dot.visible { opacity: 1; }
-    .mem.left .mem-dot { right: -26px; }
-    .mem.right .mem-dot { left: -26px; }
 
+    /* Connector line from card to dot */
     .mem-stem {
-      position: absolute; top: 15px; height: 1px; background: #C0A090;
+      position: absolute; top: 17px; height: 1px; background: #C0A090;
       z-index: 1; opacity: 0; transition: opacity 0.4s ease 0.3s, width 0.4s ease 0.3s; width: 0;
     }
-    .mem-card.visible ~ .mem-stem, .mem-stem.visible { opacity: 0.5; width: 20px; }
-    .mem.left .mem-stem { right: -18px; }
-    .mem.right .mem-stem { left: -18px; }
+    .mem-card.visible ~ .mem-stem, .mem-stem.visible { opacity: 0.45; }
+    .mem.left .mem-stem { right: 0; width: 20px !important; }
+    .mem.right .mem-stem { left: 0; width: 20px !important; }
 
     /* ========== Modal ========== */
     .modal-mask {
@@ -462,11 +464,11 @@
     /* ========== Mobile ========== */
     @media (max-width: 640px) {
       .hero { min-height: 100svh; padding: 0 16px; }
-      .mem { padding: 0 10px 52px 40px !important; justify-content: flex-start !important; }
-      .mem-dot { left: -22px !important; right: auto !important; }
-      .mem-stem { left: -16px !important; right: auto !important; width: 14px !important; }
-      .mem-card { transform: translateX(14px) scale(0.97); }
-      .mem-card.visible { transform: translateX(0) scale(1); }
+      .mem { padding: 0 14px 44px !important; padding-right: 54% !important; justify-content: flex-start !important; }
+      .mem.right { padding-right: 14px !important; padding-left: 54% !important; justify-content: flex-end !important; }
+      .mem-dot { left: 50% !important; right: auto !important; transform: translateX(-50%) !important; }
+      .mem.left .mem-stem { right: 0 !important; left: auto !important; }
+      .mem.right .mem-stem { left: 0 !important; right: auto !important; }
       .vinyl { bottom: 16px; right: 16px; width: 42px; height: 42px; }
       .back-top { bottom: 16px; left: 16px; width: 30px; height: 30px; }
       .stat-num { font-size: 20px; }
@@ -569,8 +571,7 @@
     </div>
 
     <section class="vine-section" id="vineSection">
-      <svg class="vine-svg" id="vineSvg"><path class="vine-path" id="vinePath" d=""></path></svg>
-      <div id="vineLeaves"></div>
+      <div class="vine-line" id="vineLine"></div>
       <div id="memories"></div>
     </section>
 
@@ -757,11 +758,7 @@
     // Data + Timeline + Modal
     (function () {
       var section = document.getElementById('vineSection');
-      var svg = document.getElementById('vineSvg');
-      var path = document.getElementById('vinePath');
-      var leavesBox = document.getElementById('vineLeaves');
       var container = document.getElementById('memories');
-      var isMobile = window.innerWidth <= 640;
 
       var DATA = {
         "hero":{"img":"","startDate":"2025.10.21","quote":"2025.10.21 认识，2026.03.07 在一起<br>以后的每一天，都是我们的故事","names":"刘宣富 & 穆奕彤"},
@@ -873,91 +870,37 @@
         if (h.quote) document.getElementById('quoteText').innerHTML = h.quote;
         if (h.startDate) START_DATE = new Date(h.startDate);
         loadMemories(DATA.memories);
-        requestAnimationFrame(function () {
-          requestAnimationFrame(function () { buildVine(); });
-        });
       })();
 
-      var totalLen = 0;
+      // Scroll: vine line grows + cards appear
+      var vineLine = document.getElementById('vineLine');
+      var memEls = document.querySelectorAll('.mem');
+      var memCards = document.querySelectorAll('.mem-card');
+      var memDots = document.querySelectorAll('.mem-dot');
+      var memStems = document.querySelectorAll('.mem-stem');
 
-      function buildVine() {
-        var memEls = document.querySelectorAll('.mem');
-        var w = section.offsetWidth;
-        var h = section.offsetHeight;
-        svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
-        svg.style.width = w + 'px';
-        svg.style.height = h + 'px';
+      function onScroll() {
+        var rect = section.getBoundingClientRect();
+        var viewH = window.innerHeight;
 
-        var points = [];
-        memEls.forEach(function (el) {
-          var card = el.querySelector('.mem-card');
-          var rect = card.getBoundingClientRect();
-          var sRect = section.getBoundingClientRect();
-          var cy = rect.top - sRect.top + 14;
-          var cx = isMobile ? 18 : (el.classList.contains('left') ? rect.right - sRect.left + 8 : rect.left - sRect.left - 8);
-          points.push({ x: cx, y: cy });
+        // Grow vine line
+        var scrolled = Math.max(0, -rect.top + viewH * 0.5);
+        var total = rect.height;
+        var progress = Math.min(scrolled / total, 1);
+        vineLine.style.height = (progress * total) + 'px';
+
+        // Reveal cards
+        memEls.forEach(function (item, i) {
+          if (item.getBoundingClientRect().top < viewH * 0.82) {
+            if (memCards[i]) memCards[i].classList.add('visible');
+            if (memDots[i]) memDots[i].classList.add('visible');
+            if (memStems[i]) memStems[i].classList.add('visible');
+          }
         });
-
-        if (points.length > 0) {
-          points.unshift({ x: points[0].x, y: 0 });
-          points.push({ x: points[points.length-1].x, y: h });
-        }
-
-        var d = 'M '+points[0].x.toFixed(1)+' '+points[0].y.toFixed(1);
-        for (var j = 0; j < points.length - 1; j++) {
-          var p0 = points[Math.max(0,j-1)], p1 = points[j], p2 = points[j+1], p3 = points[Math.min(points.length-1,j+2)];
-          var t = 5;
-          d += ' C '+(p1.x+(p2.x-p0.x)/t).toFixed(1)+' '+(p1.y+(p2.y-p0.y)/t).toFixed(1)
-            +', '+(p2.x-(p3.x-p1.x)/t).toFixed(1)+' '+(p2.y-(p3.y-p1.y)/t).toFixed(1)
-            +', '+p2.x.toFixed(1)+' '+p2.y.toFixed(1);
-        }
-
-        path.setAttribute('d', d);
-        totalLen = path.getTotalLength();
-        path.style.strokeDasharray = totalLen;
-        path.style.strokeDashoffset = totalLen;
-
-        leavesBox.innerHTML = '';
-        memEls.forEach(function (el, i) {
-          if (i >= points.length - 2) return;
-          var pt = points[i+1];
-          var side = i % 2 === 0 ? 1 : -1;
-          var leaf = document.createElement('div');
-          leaf.className = 'vine-leaf';
-          leaf.style.left = (pt.x + side * (isMobile ? 8 : 14)) + 'px';
-          leaf.style.top = pt.y + 'px';
-          leaf.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#B8C9A3" stroke-width="1.5"><path d="M12 2C6 8 2 14 12 22C22 14 18 8 12 2Z"/><line x1="12" y1="8" x2="12" y2="22"/></svg>';
-          leavesBox.appendChild(leaf);
-        });
-
-        var memCards = document.querySelectorAll('.mem-card');
-        var memDots = document.querySelectorAll('.mem-dot');
-        var memStems = document.querySelectorAll('.mem-stem');
-        var leafEls = document.querySelectorAll('.vine-leaf');
-
-        function onScroll() {
-          var rect = section.getBoundingClientRect();
-          var viewH = window.innerHeight;
-          var scrolled = Math.max(0, -rect.top + viewH * 0.6);
-          var total = rect.height;
-          path.style.strokeDashoffset = totalLen * (1 - Math.min(scrolled / total, 1));
-          memEls.forEach(function (item, i) {
-            if (item.getBoundingClientRect().top < viewH * 0.82) {
-              if (memCards[i]) memCards[i].classList.add('visible');
-              if (memDots[i]) memDots[i].classList.add('visible');
-              if (memStems[i]) memStems[i].classList.add('visible');
-              if (leafEls[i]) leafEls[i].classList.add('visible');
-            }
-          });
-        }
-        window.addEventListener('scroll', onScroll, { passive: true });
-        onScroll();
       }
 
-      window.addEventListener('resize', function () {
-        isMobile = window.innerWidth <= 640;
-        if (document.querySelectorAll('.mem').length) buildVine();
-      });
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
     })();
 
     // Progress
