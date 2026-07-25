@@ -1,23 +1,31 @@
-[
-  {
-    "date": "2025 / 10 / 21",
-    "title": "第一次认识",
-    "text": "123",
-    "img": "images/couple.jpg",
-    "highlight": true
-  },
-  {
-    "date": "2026 / 03 / 07",
-    "title": "在一起了",
-    "text": "在这里写表白的故事...",
+{
+  "hero": {
     "img": "",
-    "highlight": true
+    "startDate": "2025.10.21",
+    "quote": "2025.10.21 认识，2026.03.07 在一起<br>以后的每一天，都是我们的故事",
+    "names": "刘宣富 & 穆奕彤"
   },
-  {
-    "date": "在这里填日期",
-    "title": "回忆标题",
-    "text": "在这里写你们的故事...",
-    "img": "",
-    "highlight": false
-  }
-]
+  "memories": [
+    {
+      "date": "2025 / 10 / 21",
+      "title": "第一次认识",
+      "text": "在这里写你们认识的故事...",
+      "img": "",
+      "highlight": true
+    },
+    {
+      "date": "2026 / 03 / 07",
+      "title": "在一起了",
+      "text": "在这里写表白的故事...",
+      "img": "",
+      "highlight": true
+    },
+    {
+      "date": "在这里填日期",
+      "title": "回忆标题",
+      "text": "在这里写你们的故事...",
+      "img": "",
+      "highlight": false
+    }
+  ]
+}

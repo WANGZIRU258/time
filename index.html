@@ -33,7 +33,109 @@
 
     img { max-width: 100%; display: block; }
 
-    /* ========== Tap Overlay ========== */
+    /* ========== Welcome Page ========== */
+    .welcome {
+      position: fixed; inset: 0; z-index: 10000;
+      background: linear-gradient(160deg, #1A1A1A 0%, #2D2319 50%, #1A1A1A 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      cursor: pointer; overflow: hidden;
+    }
+    .welcome.hide {
+      opacity: 0; transform: scale(1.05);
+      pointer-events: none;
+    }
+
+    .welcome-particles {
+      position: absolute; inset: 0; pointer-events: none;
+    }
+    .welcome-particle {
+      position: absolute; border-radius: 50%; background: var(--accent-warm);
+      opacity: 0; animation: floatUp 6s ease-in infinite;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 0; transform: translateY(0) scale(0); }
+      20% { opacity: 0.6; }
+      100% { opacity: 0; transform: translateY(-400px) scale(1); }
+    }
+
+    .welcome-ring {
+      width: 120px; height: 120px; border-radius: 50%;
+      border: 1px solid rgba(212,165,116,0.3);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 40px; position: relative;
+      animation: ringPulse 3s ease-in-out infinite;
+    }
+    .welcome-ring::before {
+      content: ''; position: absolute; inset: -8px; border-radius: 50%;
+      border: 1px solid rgba(212,165,116,0.15);
+    }
+
+    @keyframes ringPulse {
+      0%,100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+    }
+
+    .welcome-heart {
+      font-size: 36px; animation: heartBeat 1.5s ease-in-out infinite;
+    }
+    @keyframes heartBeat {
+      0%,100% { transform: scale(1); }
+      15% { transform: scale(1.15); }
+      30% { transform: scale(1); }
+      45% { transform: scale(1.1); }
+    }
+
+    .welcome-names {
+      font-size: clamp(22px, 6vw, 32px); color: #fff; letter-spacing: 6px;
+      font-weight: 300; margin-bottom: 12px; text-align: center;
+    }
+
+    .welcome-amp {
+      color: var(--accent-warm); font-size: 18px; margin: 0 4px;
+      font-style: italic; font-weight: 300;
+    }
+
+    .welcome-sub {
+      font-size: 13px; color: rgba(255,255,255,0.4); letter-spacing: 4px;
+      font-weight: 300; margin-bottom: 60px;
+    }
+
+    .welcome-btn {
+      position: relative; padding: 14px 40px;
+      background: transparent; border: 1px solid rgba(212,165,116,0.5);
+      color: var(--accent-warm); font-size: 14px; letter-spacing: 3px;
+      cursor: pointer; border-radius: 40px; transition: all 0.4s ease;
+      font-family: inherit; font-weight: 300;
+    }
+    .welcome-btn:hover {
+      background: rgba(212,165,116,0.15); border-color: var(--accent-warm);
+      transform: translateY(-2px); box-shadow: 0 8px 24px rgba(212,165,116,0.2);
+    }
+    .welcome-btn::after {
+      content: ''; position: absolute; inset: -1px; border-radius: 40px;
+      background: linear-gradient(135deg, rgba(212,165,116,0.3), transparent, rgba(212,165,116,0.3));
+      z-index: -1; opacity: 0; transition: opacity 0.4s;
+    }
+    .welcome-btn:hover::after { opacity: 1; }
+
+    .welcome-hint {
+      position: absolute; bottom: 40px; font-size: 11px;
+      color: rgba(255,255,255,0.25); letter-spacing: 2px;
+      animation: hintFade 3s ease-in-out infinite;
+    }
+    @keyframes hintFade {
+      0%,100% { opacity: 0.25; }
+      50% { opacity: 0.5; }
+    }
+
+    /* ========== Main Content ========== */
+    .main-content {
+      opacity: 0; transition: opacity 0.6s ease 0.3s;
+    }
+    .main-content.show { opacity: 1; }
+
     /* ========== Vinyl ========== */
     .vinyl {
       position: fixed; bottom: 24px; right: 24px; z-index: 9999;
@@ -41,7 +143,9 @@
       background: rgba(0,0,0,0.7); border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
       box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      opacity: 0; transform: scale(0.5); transition: all 0.4s ease;
     }
+    .vinyl.show { opacity: 1; transform: scale(1); }
 
     .vinyl-disc {
       width: 100%; height: 100%; border-radius: 50%; background: #1A1A1A;
@@ -164,133 +268,67 @@
       padding: 0 0 80px;
     }
 
-    /* SVG 藤蔓主干 */
     .vine-svg {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 0;
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 100%; height: 100%; pointer-events: none; z-index: 0;
     }
 
     .vine-path {
-      fill: none;
-      stroke: var(--vine);
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-dasharray: 2000;
-      stroke-dashoffset: 2000;
+      fill: none; stroke: var(--vine); stroke-width: 2; stroke-linecap: round;
+      stroke-dasharray: 2000; stroke-dashoffset: 2000;
       transition: stroke-dashoffset 0.05s linear;
     }
 
-    /* 小叶子 */
     .vine-leaf {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      z-index: 1;
-      opacity: 0;
-      transition: opacity 0.6s ease, transform 0.6s ease;
+      position: absolute; width: 12px; height: 12px; z-index: 1;
+      opacity: 0; transition: opacity 0.6s ease, transform 0.6s ease;
       transform: scale(0) rotate(-30deg);
     }
+    .vine-leaf.visible { opacity: 0.5; transform: scale(1) rotate(0deg); }
 
-    .vine-leaf.visible {
-      opacity: 0.5;
-      transform: scale(1) rotate(0deg);
-    }
-
-    /* 记忆卡片 */
     .mem {
-      position: relative;
-      z-index: 2;
-      padding: 0 24px 56px;
-      display: flex;
-      align-items: flex-start;
+      position: relative; z-index: 2; padding: 0 24px 56px;
+      display: flex; align-items: flex-start;
     }
-
     .mem.left { justify-content: flex-start; padding-right: 52%; }
     .mem.right { justify-content: flex-end; padding-left: 52%; }
 
     .mem-card {
-      background: var(--bg-card);
-      border-radius: var(--radius);
-      padding: 20px;
-      border: 1px solid #EDEDED;
-      width: 100%;
-      opacity: 0;
-      transition: opacity 0.7s ease, transform 0.7s ease;
-      position: relative;
+      background: var(--bg-card); border-radius: var(--radius); padding: 20px;
+      border: 1px solid #EDEDED; width: 100%; opacity: 0;
+      transition: opacity 0.7s ease, transform 0.7s ease; position: relative;
     }
-
     .mem.left .mem-card { transform: translateX(-30px) scale(0.95); }
     .mem.right .mem-card { transform: translateX(30px) scale(0.95); }
+    .mem-card.visible { opacity: 1; transform: translateX(0) scale(1); }
 
-    .mem-card.visible {
-      opacity: 1;
-      transform: translateX(0) scale(1);
-    }
-
-    /* 藤蔓连接点 */
     .mem-dot {
-      position: absolute;
-      top: 12px;
-      width: 10px;
-      height: 10px;
-      background: var(--accent-warm);
-      border-radius: 50%;
-      z-index: 3;
-      opacity: 0;
-      transition: opacity 0.5s ease 0.2s;
+      position: absolute; top: 12px; width: 10px; height: 10px;
+      background: var(--accent-warm); border-radius: 50%; z-index: 3;
+      opacity: 0; transition: opacity 0.5s ease 0.2s;
     }
-    .mem-card.visible ~ .mem-dot,
-    .mem-dot.visible { opacity: 1; }
-
+    .mem-card.visible ~ .mem-dot, .mem-dot.visible { opacity: 1; }
     .mem.left .mem-dot { right: -30px; }
     .mem.right .mem-dot { left: -30px; }
 
-    /* 连接藤蔓的细线 */
     .mem-stem {
-      position: absolute;
-      top: 16px;
-      height: 1px;
-      background: var(--vine);
-      z-index: 1;
-      opacity: 0;
-      transition: opacity 0.5s ease 0.3s, width 0.5s ease 0.3s;
-      width: 0;
+      position: absolute; top: 16px; height: 1px; background: var(--vine);
+      z-index: 1; opacity: 0; transition: opacity 0.5s ease 0.3s, width 0.5s ease 0.3s; width: 0;
     }
-    .mem-card.visible ~ .mem-stem,
-    .mem-stem.visible { opacity: 0.6; width: 24px; }
-
+    .mem-card.visible ~ .mem-stem, .mem-stem.visible { opacity: 0.6; width: 24px; }
     .mem.left .mem-stem { right: -24px; }
     .mem.right .mem-stem { left: -24px; }
 
-    .mem-date {
-      font-size: 11px; color: var(--accent-warm); letter-spacing: 2px; margin-bottom: 6px; font-weight: 400;
-    }
-
-    .mem-title {
-      font-size: 16px; font-weight: 500; margin-bottom: 8px; color: var(--text); line-height: 1.4;
-    }
-
-    .mem-text {
-      font-size: 14px; color: var(--text-secondary); line-height: 1.8; font-weight: 300;
-    }
-
-    .mem-img {
-      margin-top: 12px; border-radius: 8px; overflow: hidden;
-    }
+    .mem-date { font-size: 11px; color: var(--accent-warm); letter-spacing: 2px; margin-bottom: 6px; font-weight: 400; }
+    .mem-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; color: var(--text); line-height: 1.4; }
+    .mem-text { font-size: 14px; color: var(--text-secondary); line-height: 1.8; font-weight: 300; }
+    .mem-img { margin-top: 12px; border-radius: 8px; overflow: hidden; }
     .mem-img img { width: 100%; height: auto; object-fit: cover; }
-
     .mem-img-ph {
       width: 100%; aspect-ratio: 16/10; background: var(--accent-bg);
       display: flex; align-items: center; justify-content: center;
       color: var(--accent); font-size: 18px; border-radius: 8px; margin-top: 12px;
     }
-
     .mem-card.highlight { background: #FEFCFA; border-color: var(--accent-bg); }
 
     /* ========== Footer ========== */
@@ -305,18 +343,12 @@
     @media (max-width: 640px) {
       .hero { min-height: 100svh; padding: 0 16px; }
       .vine-svg { left: 28px; transform: none; width: 4px; }
-
-      .mem {
-        padding: 0 16px 48px 52px !important;
-        justify-content: flex-start !important;
-      }
-
+      .mem { padding: 0 16px 48px 52px !important; justify-content: flex-start !important; }
       .mem-dot { left: -30px !important; right: auto !important; }
       .mem-stem { left: -24px !important; right: auto !important; }
       .mem-card { transform: translateX(20px) scale(0.97); }
       .mem-card.visible { transform: translateX(0) scale(1); }
       .mem-card { padding: 16px; }
-
       .vinyl { bottom: 16px; right: 16px; width: 46px; height: 46px; }
     }
 
@@ -334,68 +366,135 @@
     <source src="music.mp3" type="audio/mpeg">
   </audio>
 
-  <div class="vinyl" id="vinylPlayer">
-    <div class="vinyl-note">♪</div>
-    <div class="vinyl-note">♫</div>
-    <div class="vinyl-note">♪</div>
-    <div class="vinyl-disc"><div class="vinyl-label"></div></div>
-    <div class="vinyl-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+  <!-- Welcome Page -->
+  <div class="welcome" id="welcome">
+    <div class="welcome-particles" id="welcomeParticles"></div>
+    <div class="welcome-ring">
+      <div class="welcome-heart">&#10084;</div>
+    </div>
+    <div class="welcome-names">刘宣富 <span class="welcome-amp">&</span> 穆奕彤</div>
+    <div class="welcome-sub">Our Love Story</div>
+    <button class="welcome-btn" id="welcomeBtn">点击进入</button>
+    <div class="welcome-hint">请佩戴耳机获得最佳体验</div>
   </div>
 
-  <!-- Hero -->
-  <header class="hero">
-    <div class="hero-photo">
-      <div class="hero-photo-placeholder">📷</div>
-      <!-- <img src="images/couple.jpg" alt="我们"> -->
-    </div>
-    <div class="date-range">
-      <span>2025.10.21</span>
-      <span class="line"></span>
-      <span>now</span>
-    </div>
-    <div class="scroll-hint">
-      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-    </div>
-  </header>
+  <!-- Main Content -->
+  <div class="main-content" id="mainContent">
 
-  <!-- Timer -->
-  <div class="timer">
-    <div class="timer-label">我们已经认识了</div>
-    <div class="timer-display">
-      <div class="timer-unit"><span class="timer-num" id="tDay">0</span><span class="timer-tag">天</span></div>
-      <span class="timer-sep">:</span>
-      <div class="timer-unit"><span class="timer-num" id="tHour">0</span><span class="timer-tag">时</span></div>
-      <span class="timer-sep">:</span>
-      <div class="timer-unit"><span class="timer-num" id="tMin">0</span><span class="timer-tag">分</span></div>
-      <span class="timer-sep">:</span>
-      <div class="timer-unit"><span class="timer-num" id="tSec">0</span><span class="timer-tag">秒</span></div>
+    <div class="vinyl" id="vinylPlayer">
+      <div class="vinyl-note">&#9834;</div>
+      <div class="vinyl-note">&#9835;</div>
+      <div class="vinyl-note">&#9834;</div>
+      <div class="vinyl-disc"><div class="vinyl-label"></div></div>
+      <div class="vinyl-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
     </div>
-    <div class="timer-date">2025.10.21 — 至今</div>
+
+    <!-- Hero -->
+    <header class="hero">
+      <div class="hero-photo" id="heroPhoto">
+        <div class="hero-photo-placeholder" id="heroPlaceholder">&#128247;</div>
+      </div>
+      <div class="date-range">
+        <span id="heroStartDate">2025.10.21</span>
+        <span class="line"></span>
+        <span>now</span>
+      </div>
+      <div class="scroll-hint">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      </div>
+    </header>
+
+    <!-- Timer -->
+    <div class="timer">
+      <div class="timer-label">我们已经认识了</div>
+      <div class="timer-display">
+        <div class="timer-unit"><span class="timer-num" id="tDay">0</span><span class="timer-tag">天</span></div>
+        <span class="timer-sep">:</span>
+        <div class="timer-unit"><span class="timer-num" id="tHour">0</span><span class="timer-tag">时</span></div>
+        <span class="timer-sep">:</span>
+        <div class="timer-unit"><span class="timer-num" id="tMin">0</span><span class="timer-tag">分</span></div>
+        <span class="timer-sep">:</span>
+        <div class="timer-unit"><span class="timer-num" id="tSec">0</span><span class="timer-tag">秒</span></div>
+      </div>
+      <div class="timer-date">2025.10.21 — 至今</div>
+    </div>
+
+    <div class="quote-section">
+      <p class="quote-text" id="quoteText">2025.10.21 认识，2026.03.07 在一起<br>以后的每一天，都是我们的故事</p>
+    </div>
+
+    <!-- Vine Timeline -->
+    <section class="vine-section" id="vineSection">
+      <svg class="vine-svg" id="vineSvg" preserveAspectRatio="none">
+        <path class="vine-path" id="vinePath" d=""></path>
+      </svg>
+      <div id="vineLeaves"></div>
+      <div id="memories"></div>
+    </section>
+
+    <footer class="footer">
+      <div class="footer-line"></div>
+      <p>用时间记录我们</p>
+      <div class="footer-names" id="footerNames">刘宣富 & 穆奕彤</div>
+    </footer>
   </div>
-
-  <div class="quote-section">
-    <p class="quote-text">2025.10.21 认识，2026.03.07 在一起<br>以后的每一天，都是我们的故事</p>
-  </div>
-
-  <!-- Vine Timeline -->
-  <section class="vine-section" id="vineSection">
-    <svg class="vine-svg" id="vineSvg" preserveAspectRatio="none">
-      <path class="vine-path" id="vinePath" d=""></path>
-    </svg>
-    <div id="vineLeaves"></div>
-    <div id="memories"></div>
-  </section>
-
-  <footer class="footer">
-    <div class="footer-line"></div>
-    <p>用时间记录我们</p>
-    <div class="footer-names">刘宣富 & 穆奕彤</div>
-  </footer>
 
   <script>
     var START_DATE = new Date('2025-10-21');
 
-    // 计时器
+    // Welcome particles
+    (function () {
+      var box = document.getElementById('welcomeParticles');
+      for (var i = 0; i < 20; i++) {
+        var p = document.createElement('div');
+        p.className = 'welcome-particle';
+        var size = Math.random() * 4 + 2;
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.top = Math.random() * 100 + '%';
+        p.style.animationDelay = Math.random() * 6 + 's';
+        p.style.animationDuration = (Math.random() * 4 + 4) + 's';
+        box.appendChild(p);
+      }
+    })();
+
+    // Welcome -> Main transition
+    (function () {
+      var welcome = document.getElementById('welcome');
+      var mainContent = document.getElementById('mainContent');
+      var vinyl = document.getElementById('vinylPlayer');
+      var audio = document.getElementById('bgMusic');
+      var entered = false;
+
+      function enterSite() {
+        if (entered) return;
+        entered = true;
+
+        // Play music first (user gesture)
+        audio.play().then(function () {
+          vinyl.classList.add('playing');
+        }).catch(function () {});
+
+        // Fade out welcome
+        welcome.classList.add('hide');
+
+        // Show main content
+        setTimeout(function () {
+          mainContent.classList.add('show');
+          vinyl.classList.add('show');
+        }, 400);
+
+        // Remove welcome from DOM
+        setTimeout(function () {
+          welcome.style.display = 'none';
+        }, 900);
+      }
+
+      welcome.addEventListener('click', enterSite);
+    })();
+
+    // Timer
     (function () {
       function tick() {
         var d = Math.floor((new Date() - START_DATE) / 1000);
@@ -410,7 +509,7 @@
       tick(); setInterval(tick, 1000);
     })();
 
-    // 藤蔓生长 + 卡片动画
+    // Vine + Memories
     (function () {
       var section = document.getElementById('vineSection');
       var svg = document.getElementById('vineSvg');
@@ -419,7 +518,8 @@
       var container = document.getElementById('memories');
       var isMobile = window.innerWidth <= 640;
 
-      // 从 data.json 加载记忆并生成卡片
+      var DATA = {"hero":{"img":"","startDate":"2025.10.21","quote":"2025.10.21 认识，2026.03.07 在一起<br>以后的每一天，都是我们的故事","names":"刘宣富 & 穆奕彤"},"memories":[{"date":"2025 / 10 / 21","title":"第一次认识","text":"在这里写你们认识的故事...","img":"","highlight":true},{"date":"2026 / 03 / 07","title":"在一起了","text":"在这里写表白的故事...","img":"","highlight":true},{"date":"在这里填日期","title":"回忆标题","text":"在这里写你们的故事...","img":"","highlight":false}]};
+
       function loadMemories(data) {
         container.innerHTML = '';
         data.forEach(function (item, i) {
@@ -427,7 +527,7 @@
           var hl = item.highlight ? ' highlight' : '';
           var imgHtml = item.img
             ? '<div class="mem-img"><img src="' + item.img + '" alt="' + item.title + '" loading="lazy"></div>'
-            : '<div class="mem-img-ph">📷</div>';
+            : '<div class="mem-img-ph">&#128247;</div>';
           var html = '<div class="mem ' + side + '" data-vine>'
             + '<div class="mem-card' + hl + '">'
             + '<div class="mem-date">' + item.date + '</div>'
@@ -442,17 +542,29 @@
         });
       }
 
-      // 加载 data.json
-      fetch('data.json')
-        .then(function (r) { return r.json(); })
-        .then(function (data) {
-          loadMemories(data);
-          buildLeaves();
-          initVine();
-        })
-        .catch(function () {
-          container.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">加载中...</p>';
-        });
+      (function () {
+        var data = DATA;
+        if (data.hero) {
+          var h = data.hero;
+          if (h.img) {
+            document.getElementById('heroPlaceholder').style.display = 'none';
+            var img = document.createElement('img');
+            img.src = h.img;
+            img.alt = '我们';
+            document.getElementById('heroPhoto').appendChild(img);
+          }
+          if (h.startDate) document.getElementById('heroStartDate').textContent = h.startDate;
+          if (h.quote) document.getElementById('quoteText').innerHTML = h.quote;
+          if (h.names) document.getElementById('footerNames').textContent = h.names;
+          if (h.startDate) {
+            START_DATE = new Date(h.startDate);
+          }
+        }
+        var memories = data.memories || data;
+        loadMemories(memories);
+        buildLeaves();
+        initVine();
+      })();
 
       function buildPath() {
         var items = document.querySelectorAll('.mem');
@@ -556,7 +668,7 @@
       });
     })();
 
-    // 音乐
+    // Music controls
     (function () {
       var audio = document.getElementById('bgMusic');
       var vinyl = document.getElementById('vinylPlayer');
@@ -571,7 +683,6 @@
           vinyl.style.opacity = '1';
         }).catch(function (e) {
           vinyl.style.opacity = '1';
-          console.error('播放失败:', e);
         });
       }
 
@@ -590,16 +701,7 @@
           start();
         }
       });
-
-      // 尝试自动播放
-      audio.addEventListener('canplay', function () {
-        audio.play().then(function () {
-          playing = true;
-          vinyl.classList.add('playing');
-        }).catch(function () {});
-      });
     })();
   </script>
-
 </body>
 </html>
