@@ -856,36 +856,29 @@
       btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
     })();
 
-    // Music - create fresh Audio on user gesture for max compatibility
+    // Music
     (function () {
       var vinyl = document.getElementById('vinylPlayer');
-      var audio = null;
+      var audio = new Audio('music.mp3');
+      audio.loop = true;
+      audio.preload = 'auto';
       var playing = false;
+
+      // Preload as soon as page loads
+      audio.load();
 
       window.__playMusic = function () {
         if (playing) return;
-        // Always create fresh Audio on click — most reliable across browsers
-        if (!audio) {
-          audio = new Audio('music.mp3');
-          audio.loop = true;
-        }
         audio.currentTime = 0;
-        var p = audio.play();
-        if (p && p.then) {
-          p.then(function () {
-            playing = true;
-            vinyl.classList.add('playing');
-          }).catch(function (e) {
-            console.log('Play blocked:', e);
-          });
-        } else {
+        audio.play().then(function () {
           playing = true;
           vinyl.classList.add('playing');
-        }
+        }).catch(function (e) {
+          console.log('Play blocked:', e);
+        });
       };
 
       window.__stopMusic = function () {
-        if (!audio) return;
         audio.pause();
         playing = false;
         vinyl.classList.remove('playing');
