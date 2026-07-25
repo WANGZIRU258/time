@@ -34,14 +34,9 @@
     img { max-width: 100%; display: block; }
 
     /* ========== Tap Overlay ========== */
-    .tap-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      z-index: 9999; cursor: pointer; -webkit-tap-highlight-color: transparent;
-    }
-
     /* ========== Vinyl ========== */
     .vinyl {
-      position: fixed; bottom: 24px; right: 24px; z-index: 1000;
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
       width: 52px; height: 52px; cursor: pointer; -webkit-tap-highlight-color: transparent;
     }
 
@@ -332,8 +327,6 @@
 </head>
 <body>
 
-  <div class="tap-overlay" id="tapOverlay"></div>
-
   <audio id="bgMusic" loop preload="auto">
     <source src="music.mp3" type="audio/mpeg">
   </audio>
@@ -573,15 +566,30 @@
     (function () {
       var audio = document.getElementById('bgMusic');
       var vinyl = document.getElementById('vinylPlayer');
-      var overlay = document.getElementById('tapOverlay');
       var playing = false;
 
-      function start() { audio.play().then(function () { playing = true; vinyl.classList.add('playing'); }).catch(function () {}); }
-      function stop() { audio.pause(); playing = false; vinyl.classList.remove('playing'); }
+      function start() {
+        audio.play().then(function () {
+          playing = true;
+          vinyl.classList.add('playing');
+        }).catch(function () {
+          alert('请检查音乐文件 music.mp3 是否存在');
+        });
+      }
 
-      overlay.addEventListener('click', function () { start(); overlay.remove(); });
-      overlay.addEventListener('touchend', function () { start(); overlay.remove(); });
-      vinyl.addEventListener('click', function (e) { e.stopPropagation(); playing ? stop() : start(); });
+      function stop() {
+        audio.pause();
+        playing = false;
+        vinyl.classList.remove('playing');
+      }
+
+      vinyl.addEventListener('click', function () {
+        if (playing) {
+          stop();
+        } else {
+          start();
+        }
+      });
     })();
   </script>
 
