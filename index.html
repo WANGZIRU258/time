@@ -472,6 +472,7 @@
       .stat-num { font-size: 20px; }
       .modal-body { padding: 18px 20px 22px; }
       .modal-title { font-size: 17px; }
+      .converge-item { width: 110px; height: 75px; border-radius: 6px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -631,12 +632,15 @@
         else if (side === 2) { startX = Math.random() * w; startY = h + 80; }
         else { startX = -80; startY = Math.random() * h; }
 
+        var isMob = window.innerWidth <= 640;
         var item = document.createElement('div');
         item.className = 'converge-item';
         item.style.left = startX + 'px';
         item.style.top = startY + 'px';
-        item.style.width = (140 + Math.random() * 100) + 'px';
-        item.style.height = (100 + Math.random() * 70) + 'px';
+        if (!isMob) {
+          item.style.width = (140 + Math.random() * 100) + 'px';
+          item.style.height = (100 + Math.random() * 70) + 'px';
+        }
 
         var src = photos[photoIdx % photos.length];
         photoIdx++;
