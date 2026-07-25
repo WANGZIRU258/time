@@ -457,10 +457,6 @@
 </head>
 <body>
 
-  <audio id="bgMusic" loop preload="auto">
-    <source src="music.mp3" type="audio/mpeg">
-  </audio>
-
   <div class="progress-bar" id="progressBar"></div>
 
   <!-- Welcome -->
@@ -860,21 +856,49 @@
       btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
     })();
 
-    // Music
+    // Music - create fresh Audio on user gesture for max compatibility
     (function () {
-      var audio = document.getElementById('bgMusic');
       var vinyl = document.getElementById('vinylPlayer');
+      var audio = null;
       var playing = false;
+
       window.__playMusic = function () {
         if (playing) return;
-        audio.play().then(function () { playing = true; vinyl.classList.add('playing'); }).catch(function () {});
+        // Always create fresh Audio on click — most reliable across browsers
+        if (!audio) {
+          audio = new Audio('music.mp3');
+          audio.loop = true;
+        }
+        audio.currentTime = 0;
+        var p = audio.play();
+        if (p && p.then) {
+          p.then(function () {
+            playing = true;
+            vinyl.classList.add('playing');
+          }).catch(function (e) {
+            console.log('Play blocked:', e);
+          });
+        } else {
+          playing = true;
+          vinyl.classList.add('playing');
+        }
       };
+
       window.__stopMusic = function () {
-        audio.pause(); playing = false; vinyl.classList.remove('playing');
+        if (!audio) return;
+        audio.pause();
+        playing = false;
+        vinyl.classList.remove('playing');
       };
+
       vinyl.addEventListener('click', function (e) {
-        e.preventDefault(); e.stopPropagation();
-        playing ? window.__stopMusic() : window.__playMusic();
+        e.preventDefault();
+        e.stopPropagation();
+        if (playing) {
+          window.__stopMusic();
+        } else {
+          window.__playMusic();
+        }
       });
     })();
   </script>
