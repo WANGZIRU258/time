@@ -480,39 +480,41 @@
     .footer .footer-year { font-size: 10px; color: var(--pink); margin-top: 12px; letter-spacing: 2px; font-weight: 400; opacity: 0.3; }
 
     /* Ending tree scene */
-    .ending { position: relative; height: 280px; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 20px; }
+    .ending { position: relative; height: 300px; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px; }
 
     .tree-wrap {
-      position: relative; cursor: pointer; transition: transform 0.15s ease;
+      position: relative; cursor: pointer; transition: transform 0.3s ease;
       -webkit-tap-highlight-color: transparent;
     }
-    .tree-wrap:active { transform: scale(0.96); }
-    .tree-wrap svg { width: 180px; height: 220px; }
+    .tree-wrap:active { transform: scale(0.98) rotate(-1deg); }
+    .tree-wrap svg { width: 200px; height: 240px; }
 
     .tree-hint {
       position: absolute; bottom: -28px; left: 50%; transform: translateX(-50%);
-      font-size: 10px; color: var(--pink); letter-spacing: 2px; opacity: 0.35;
+      font-size: 11px; color: var(--pink); letter-spacing: 2px; opacity: 0.4;
       white-space: nowrap; animation: hintPulse 2.5s ease-in-out infinite;
     }
     @keyframes hintPulse { 0%,100% { opacity: 0.25; } 50% { opacity: 0.55; } }
 
     .ending-drop {
       position: absolute; left: 50%; top: 0; margin-left: -3px;
-      width: 6px; height: 10px; background: #B8D4E8;
+      width: 5px; height: 8px;
+      background: linear-gradient(180deg, rgba(184,212,232,0.3), rgba(184,212,232,0.7));
       border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-      opacity: 0; animation: dropFall 3s ease-in infinite;
+      opacity: 0; animation: dropFall 4s ease-in infinite;
     }
     @keyframes dropFall {
       0% { opacity: 0; transform: translateY(-10px); }
-      15% { opacity: 0.7; }
-      65% { opacity: 0.5; }
-      100% { opacity: 0; transform: translateY(160px); }
+      10% { opacity: 0.5; }
+      60% { opacity: 0.35; }
+      100% { opacity: 0; transform: translateY(170px); }
     }
 
     /* Fireworks */
     .fireworks-canvas {
       position: fixed; inset: 0; z-index: 10002;
       pointer-events: none; display: none;
+      background: rgba(0,0,0,0.08);
     }
 
     /* Final black screen */
@@ -520,22 +522,22 @@
       position: fixed; inset: 0; z-index: 10003;
       background: #0A0A0A;
       display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 1.2s ease;
+      opacity: 0; pointer-events: none; transition: opacity 1.5s ease;
     }
     .final-screen.show { opacity: 1; pointer-events: auto; }
     .final-text {
       font-family: var(--serif);
-      font-size: clamp(18px, 5vw, 26px); color: rgba(255,255,255,0.9);
+      font-size: clamp(18px, 5vw, 26px); color: rgba(255,255,255,0.85);
       letter-spacing: 4px; font-weight: 400; text-align: center;
-      line-height: 2.2; opacity: 0; transform: translateY(12px);
-      transition: opacity 1.5s ease 0.8s, transform 1.5s ease 0.8s;
+      line-height: 2.2; opacity: 0; transform: translateY(10px);
+      transition: opacity 2s ease 0.6s, transform 2s ease 0.6s;
     }
     .final-screen.show .final-text { opacity: 1; transform: translateY(0); }
     .final-heart {
-      display: block; margin: 20px auto 0; font-size: 18px; opacity: 0;
-      transition: opacity 1s ease 2.5s;
+      display: block; margin: 20px auto 0; font-size: 16px; opacity: 0;
+      transition: opacity 1s ease 2s;
     }
-    .final-screen.show .final-heart { opacity: 0.5; animation: heartBeat 1.5s ease-in-out 2.5s infinite; }
+    .final-screen.show .final-heart { opacity: 0.4; animation: heartBeat 1.5s ease-in-out 2s infinite; }
 
     /* ========== Progress ========== */
     .progress-bar {
@@ -687,57 +689,93 @@
     <div class="ending">
       <div class="ending-drop"></div>
       <div class="tree-wrap" id="treeWrap">
-        <svg viewBox="0 0 200 240" fill="none">
-          <!-- Ground shadow -->
-          <ellipse cx="100" cy="230" rx="55" ry="6" fill="rgba(0,0,0,0.04)"/>
+        <svg viewBox="0 0 200 260" fill="none">
+          <defs>
+            <linearGradient id="trunk" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#6B5240"/>
+              <stop offset="100%" stop-color="#4A3728"/>
+            </linearGradient>
+            <radialGradient id="blossom1" cx="50%" cy="40%">
+              <stop offset="0%" stop-color="#F5D0D8"/>
+              <stop offset="60%" stop-color="#E8A8B8"/>
+              <stop offset="100%" stop-color="#D4889A"/>
+            </radialGradient>
+            <radialGradient id="blossom2" cx="50%" cy="40%">
+              <stop offset="0%" stop-color="#FADCE4"/>
+              <stop offset="60%" stop-color="#F0B8C8"/>
+              <stop offset="100%" stop-color="#E09AAE"/>
+            </radialGradient>
+            <radialGradient id="blossom3" cx="40%" cy="35%">
+              <stop offset="0%" stop-color="#FFF0F3"/>
+              <stop offset="50%" stop-color="#F8D0DA"/>
+              <stop offset="100%" stop-color="#EDA5B8"/>
+            </radialGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <!-- Ground -->
+          <ellipse cx="100" cy="252" rx="60" ry="5" fill="rgba(0,0,0,0.03)"/>
           <!-- Trunk -->
-          <path d="M96 230 Q94 200 90 170 Q86 150 88 130 Q90 120 96 110" stroke="#8B6F4A" stroke-width="8" fill="none" stroke-linecap="round"/>
-          <path d="M104 230 Q106 200 110 170 Q114 150 112 130 Q110 120 104 110" stroke="#8B6F4A" stroke-width="8" fill="none" stroke-linecap="round"/>
-          <path d="M96 230 Q100 190 100 150 Q100 130 100 110" stroke="#A0845C" stroke-width="3" fill="none" opacity="0.4" stroke-linecap="round"/>
+          <path d="M97 250 Q95 220 92 190 Q88 165 86 145 Q84 130 88 118 Q92 108 97 100" stroke="url(#trunk)" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <path d="M103 250 Q105 220 108 190 Q112 165 114 145 Q116 130 112 118 Q108 108 103 100" stroke="url(#trunk)" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <path d="M97 250 Q100 210 100 170 Q100 140 100 100" stroke="#5A4235" stroke-width="3" fill="none" opacity="0.3" stroke-linecap="round"/>
           <!-- Branches -->
-          <path d="M92 130 Q70 110 55 95" stroke="#8B6F4A" stroke-width="4" fill="none" stroke-linecap="round"/>
-          <path d="M108 130 Q130 110 145 95" stroke="#8B6F4A" stroke-width="4" fill="none" stroke-linecap="round"/>
-          <path d="M95 120 Q75 100 65 80" stroke="#8B6F4A" stroke-width="3" fill="none" stroke-linecap="round"/>
-          <path d="M105 120 Q125 100 135 80" stroke="#8B6F4A" stroke-width="3" fill="none" stroke-linecap="round"/>
-          <path d="M100 115 Q100 90 100 70" stroke="#8B6F4A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-          <!-- Blossom clusters -->
-          <circle cx="55" cy="90" r="22" fill="#F8C8D4" opacity="0.5"/>
-          <circle cx="55" cy="90" r="16" fill="#FADCE4" opacity="0.6"/>
-          <circle cx="145" cy="90" r="22" fill="#F8C8D4" opacity="0.5"/>
-          <circle cx="145" cy="90" r="16" fill="#FADCE4" opacity="0.6"/>
-          <circle cx="65" cy="75" r="18" fill="#F8C8D4" opacity="0.45"/>
-          <circle cx="135" cy="75" r="18" fill="#F8C8D4" opacity="0.45"/>
-          <circle cx="100" cy="65" r="24" fill="#F8C8D4" opacity="0.5"/>
-          <circle cx="100" cy="65" r="17" fill="#FADCE4" opacity="0.6"/>
-          <circle cx="80" cy="80" r="14" fill="#FBBFCF" opacity="0.5"/>
-          <circle cx="120" cy="80" r="14" fill="#FBBFCF" opacity="0.5"/>
-          <circle cx="100" cy="50" r="12" fill="#FADCE4" opacity="0.4"/>
-          <!-- Blossom petals (small) -->
-          <circle cx="48" cy="82" r="4" fill="#E8889A" opacity="0.6"/>
-          <circle cx="62" cy="100" r="3.5" fill="#E8889A" opacity="0.5"/>
-          <circle cx="138" cy="82" r="4" fill="#E8889A" opacity="0.6"/>
-          <circle cx="150" cy="100" r="3.5" fill="#E8889A" opacity="0.5"/>
-          <circle cx="85" cy="62" r="3" fill="#D4738B" opacity="0.5"/>
-          <circle cx="115" cy="62" r="3" fill="#D4738B" opacity="0.5"/>
-          <circle cx="100" cy="45" r="3.5" fill="#E8889A" opacity="0.5"/>
-          <circle cx="72" cy="70" r="2.5" fill="#D4738B" opacity="0.4"/>
-          <circle cx="128" cy="70" r="2.5" fill="#D4738B" opacity="0.4"/>
-          <!-- Falling petals -->
-          <circle cx="40" cy="110" r="2.5" fill="#F8C8D4" opacity="0.4">
-            <animate attributeName="cy" from="110" to="220" dur="4s" repeatCount="indefinite"/>
-            <animate attributeName="cx" from="40" to="35" dur="4s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.4;0.6;0" dur="4s" repeatCount="indefinite"/>
-          </circle>
-          <circle cx="160" cy="105" r="2" fill="#FBBFCF" opacity="0.35">
-            <animate attributeName="cy" from="105" to="220" dur="5s" repeatCount="indefinite"/>
-            <animate attributeName="cx" from="160" to="165" dur="5s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.35;0.5;0" dur="5s" repeatCount="indefinite"/>
-          </circle>
-          <circle cx="90" cy="55" r="2" fill="#F8C8D4" opacity="0.3">
-            <animate attributeName="cy" from="55" to="220" dur="6s" repeatCount="indefinite"/>
-            <animate attributeName="cx" from="90" to="85" dur="6s" repeatCount="indefinite"/>
-            <animate attributeName="opacity" values="0.3;0.5;0" dur="6s" repeatCount="indefinite"/>
-          </circle>
+          <path d="M90 125 Q70 108 52 90" stroke="#5A4235" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M110 125 Q130 108 148 90" stroke="#5A4235" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <path d="M88 115 Q68 95 55 75" stroke="#5A4235" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M112 115 Q132 95 145 75" stroke="#5A4235" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M100 108 Q100 85 100 60" stroke="#5A4235" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M95 110 Q80 92 72 78" stroke="#5A4235" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M105 110 Q120 92 128 78" stroke="#5A4235" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Blossom clusters - back layer -->
+          <circle cx="52" cy="85" r="26" fill="url(#blossom2)" opacity="0.6"/>
+          <circle cx="148" cy="85" r="26" fill="url(#blossom2)" opacity="0.6"/>
+          <circle cx="55" cy="70" r="20" fill="url(#blossom3)" opacity="0.5"/>
+          <circle cx="145" cy="70" r="20" fill="url(#blossom3)" opacity="0.5"/>
+          <!-- Blossom clusters - mid layer -->
+          <circle cx="72" cy="72" r="22" fill="url(#blossom1)" opacity="0.65"/>
+          <circle cx="128" cy="72" r="22" fill="url(#blossom1)" opacity="0.65"/>
+          <circle cx="100" cy="55" r="28" fill="url(#blossom1)" opacity="0.6"/>
+          <circle cx="85" cy="80" r="18" fill="url(#blossom3)" opacity="0.55"/>
+          <circle cx="115" cy="80" r="18" fill="url(#blossom3)" opacity="0.55"/>
+          <!-- Blossom clusters - front layer -->
+          <circle cx="60" cy="78" r="16" fill="url(#blossom3)" opacity="0.7"/>
+          <circle cx="140" cy="78" r="16" fill="url(#blossom3)" opacity="0.7"/>
+          <circle cx="100" cy="48" r="18" fill="url(#blossom3)" opacity="0.65"/>
+          <circle cx="80" cy="65" r="12" fill="#F8D0DA" opacity="0.6"/>
+          <circle cx="120" cy="65" r="12" fill="#F8D0DA" opacity="0.6"/>
+          <!-- Individual petals for realism -->
+          <circle cx="45" cy="80" r="3" fill="#E8A0B0" opacity="0.5"/>
+          <circle cx="58" cy="95" r="2.5" fill="#D4889A" opacity="0.4"/>
+          <circle cx="142" cy="80" r="3" fill="#E8A0B0" opacity="0.5"/>
+          <circle cx="155" cy="95" r="2.5" fill="#D4889A" opacity="0.4"/>
+          <circle cx="90" cy="42" r="2.5" fill="#E8A0B0" opacity="0.4"/>
+          <circle cx="110" cy="42" r="2.5" fill="#E8A0B0" opacity="0.4"/>
+          <circle cx="75" cy="58" r="2" fill="#D4889A" opacity="0.35"/>
+          <circle cx="125" cy="58" r="2" fill="#D4889A" opacity="0.35"/>
+          <!-- Falling petals - wind blown -->
+          <g filter="url(#glow)">
+            <ellipse cx="38" cy="120" rx="3" ry="2" fill="#F0C0CC" opacity="0" transform="rotate(-20 38 120)">
+              <animate attributeName="cy" from="100" to="250" dur="5s" repeatCount="indefinite"/>
+              <animate attributeName="cx" from="45" to="25" dur="5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0;0.5;0.4;0" dur="5s" repeatCount="indefinite"/>
+              <animateTransform attributeName="transform" type="rotate" from="-20 45 100" to="160 25 250" dur="5s" repeatCount="indefinite"/>
+            </ellipse>
+            <ellipse cx="158" cy="115" rx="2.5" ry="1.8" fill="#F5D0D8" opacity="0" transform="rotate(15 158 115)">
+              <animate attributeName="cy" from="95" to="250" dur="6s" repeatCount="indefinite" begin="1s"/>
+              <animate attributeName="cx" from="155" to="170" dur="6s" repeatCount="indefinite" begin="1s"/>
+              <animate attributeName="opacity" values="0;0.45;0.35;0" dur="6s" repeatCount="indefinite" begin="1s"/>
+              <animateTransform attributeName="transform" type="rotate" from="15 155 95" to="-120 170 250" dur="6s" repeatCount="indefinite" begin="1s"/>
+            </ellipse>
+            <ellipse cx="88" cy="50" rx="2" ry="1.5" fill="#EDB0C0" opacity="0" transform="rotate(10 88 50)">
+              <animate attributeName="cy" from="45" to="250" dur="7s" repeatCount="indefinite" begin="2s"/>
+              <animate attributeName="cx" from="88" to="75" dur="7s" repeatCount="indefinite" begin="2s"/>
+              <animate attributeName="opacity" values="0;0.4;0.3;0" dur="7s" repeatCount="indefinite" begin="2s"/>
+              <animateTransform attributeName="transform" type="rotate" from="10 88 45" to="-90 75 250" dur="7s" repeatCount="indefinite" begin="2s"/>
+            </ellipse>
+          </g>
         </svg>
         <div class="tree-hint" id="treeHint">点击许愿树</div>
       </div>
@@ -1127,179 +1165,98 @@
       var clickCount = 0;
       var fireworksStarted = false;
 
+      var palettes = [
+        ['#FF6B8A','#FFB3C1','#FFD6E0','#FFFFFF'],
+        ['#FFB347','#FFCC80','#FFE0B2','#FFFFFF'],
+        ['#87CEEB','#B0E0E6','#E0F7FA','#FFFFFF'],
+        ['#DDA0DD','#E8A0E8','#F0D0F0','#FFFFFF'],
+        ['#FF69B4','#FFB6C1','#FFD6E0','#FFFFFF'],
+        ['#FFD700','#FFEC8B','#FFFACD','#FFFFFF']
+      ];
+
       tree.addEventListener('click', function () {
         if (fireworksStarted) return;
         clickCount++;
-        tree.style.transform = 'rotate(' + (Math.random() * 6 - 3) + 'deg) scale(1.02)';
-        setTimeout(function () { tree.style.transform = ''; }, 200);
+
+        tree.style.transform = 'rotate(' + (Math.random() * 6 - 3) + 'deg) scale(1.03)';
+        setTimeout(function () { tree.style.transform = ''; }, 250);
+
+        // Launch firework on each click
+        launchBurst();
 
         if (clickCount >= 3) {
           fireworksStarted = true;
           hint.style.opacity = '0';
-          startFireworks();
+          // Quick finale then black screen
+          setTimeout(function () {
+            launchBurst();
+            launchBurst();
+          }, 300);
+          setTimeout(function () {
+            finalScreen.classList.add('show');
+            setTimeout(function () { canvas.style.display = 'none'; }, 1500);
+          }, 1200);
         }
       });
 
-      function startFireworks() {
+      function launchBurst() {
         canvas.style.display = 'block';
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        var fireworks = [];
+        var palette = palettes[Math.floor(Math.random() * palettes.length)];
+        var cx = canvas.width * (0.2 + Math.random() * 0.6);
+        var cy = canvas.height * (0.15 + Math.random() * 0.3);
         var sparks = [];
-        var launchCount = 0;
-        var maxLaunches = 15;
-        var done = false;
 
-        var palettes = [
-          ['#FF6B8A','#FF8FA3','#FFB3C1','#FFD6E0'],
-          ['#FFB347','#FFCC80','#FFE0B2','#FFF3E0'],
-          ['#87CEEB','#B0E0E6','#E0F7FA','#FFFFFF'],
-          ['#DDA0DD','#E8A0E8','#F0D0F0','#FFFFFF'],
-          ['#FF69B4','#FF1493','#FF6EB4','#FFB6C1'],
-          ['#FFD700','#FFEC8B','#FFFACD','#FFFFFF']
-        ];
-
-        function launch() {
-          var x = canvas.width * 0.15 + Math.random() * canvas.width * 0.7;
-          var palette = palettes[Math.floor(Math.random() * palettes.length)];
-          fireworks.push({
-            x: x, y: canvas.height,
-            targetY: 60 + Math.random() * canvas.height * 0.35,
-            speed: 4 + Math.random() * 3,
-            color: palette[0],
-            palette: palette,
-            trail: [],
-            exploded: false
+        // Spherical burst
+        var count = 50 + Math.floor(Math.random() * 30);
+        for (var i = 0; i < count; i++) {
+          var angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.3;
+          var speed = 1 + Math.random() * 4;
+          var c = palette[Math.floor(Math.random() * palette.length)];
+          sparks.push({
+            x: cx, y: cy,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 1, decay: 0.012 + Math.random() * 0.008,
+            color: c, size: 1 + Math.random() * 1.5,
+            trail: []
           });
-          launchCount++;
         }
 
-        function explode(fw) {
-          var pattern = Math.random();
-          if (pattern < 0.4) {
-            // Spherical burst
-            for (var i = 0; i < 60; i++) {
-              var angle = (Math.PI * 2 * i) / 60;
-              var speed = 0.5 + Math.random() * 4;
-              var c = fw.palette[Math.floor(Math.random() * fw.palette.length)];
-              sparks.push({
-                x: fw.x, y: fw.targetY,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                life: 1, decay: 0.008 + Math.random() * 0.008,
-                color: c, size: 1 + Math.random() * 2,
-                trail: []
-              });
-            }
-          } else if (pattern < 0.7) {
-            // Ring burst
-            for (var i = 0; i < 40; i++) {
-              var angle = (Math.PI * 2 * i) / 40;
-              var c = fw.palette[Math.floor(Math.random() * fw.palette.length)];
-              sparks.push({
-                x: fw.x, y: fw.targetY,
-                vx: Math.cos(angle) * 2.5,
-                vy: Math.sin(angle) * 2.5,
-                life: 1, decay: 0.01 + Math.random() * 0.005,
-                color: c, size: 1.5 + Math.random(),
-                trail: []
-              });
-            }
-          } else {
-            // Double burst
-            for (var i = 0; i < 35; i++) {
-              var angle = (Math.PI * 2 * i) / 35;
-              var speed = 1 + Math.random() * 2.5;
-              var c = fw.palette[0];
-              sparks.push({
-                x: fw.x, y: fw.targetY,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                life: 1, decay: 0.01,
-                color: c, size: 1.5, trail: []
-              });
-            }
-            setTimeout(function () {
-              for (var i = 0; i < 35; i++) {
-                var angle = (Math.PI * 2 * i) / 35;
-                var speed = 2 + Math.random() * 2;
-                var c2 = fw.palette[2];
-                sparks.push({
-                  x: fw.x, y: fw.targetY,
-                  vx: Math.cos(angle) * speed,
-                  vy: Math.sin(angle) * speed,
-                  life: 1, decay: 0.012,
-                  color: c2, size: 1.2, trail: []
-                });
-              }
-            }, 150);
-          }
-        }
-
+        var running = true;
         function loop() {
-          // Fade trail
-          ctx.fillStyle = 'rgba(0,0,0,0.12)';
+          ctx.fillStyle = 'rgba(10,10,10,0.15)';
           ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-          // Launch
-          if (launchCount < maxLaunches && Math.random() < 0.04) launch();
-
-          // Update fireworks (rockets)
-          for (var i = fireworks.length - 1; i >= 0; i--) {
-            var fw = fireworks[i];
-            fw.trail.push({ x: fw.x, y: fw.y });
-            if (fw.trail.length > 8) fw.trail.shift();
-
-            fw.trail.forEach(function (t, ti) {
-              ctx.beginPath();
-              ctx.arc(t.x, t.y, 1.5 * (ti / fw.trail.length), 0, Math.PI * 2);
-              ctx.fillStyle = fw.color;
-              ctx.globalAlpha = (ti / fw.trail.length) * 0.4;
-              ctx.fill();
-            });
-            ctx.globalAlpha = 1;
-
-            fw.y -= fw.speed;
-            ctx.beginPath();
-            ctx.arc(fw.x, fw.y, 2.5, 0, Math.PI * 2);
-            ctx.fillStyle = '#fff';
-            ctx.fill();
-
-            if (fw.y <= fw.targetY) {
-              fw.exploded = true;
-              explode(fw);
-              fireworks.splice(i, 1);
-            }
-          }
-
-          // Update sparks
           for (var i = sparks.length - 1; i >= 0; i--) {
             var s = sparks[i];
             s.trail.push({ x: s.x, y: s.y });
-            if (s.trail.length > 5) s.trail.shift();
+            if (s.trail.length > 6) s.trail.shift();
 
+            // Trail
             s.trail.forEach(function (t, ti) {
               ctx.beginPath();
-              ctx.arc(t.x, t.y, s.size * 0.4 * (ti / s.trail.length), 0, Math.PI * 2);
+              ctx.arc(t.x, t.y, s.size * 0.3 * (ti / s.trail.length), 0, Math.PI * 2);
               ctx.fillStyle = s.color;
-              ctx.globalAlpha = (ti / s.trail.length) * s.life * 0.3;
+              ctx.globalAlpha = (ti / s.trail.length) * s.life * 0.25;
               ctx.fill();
             });
             ctx.globalAlpha = 1;
 
             s.x += s.vx;
             s.y += s.vy;
-            s.vy += 0.03;
-            s.vx *= 0.99;
+            s.vy += 0.025;
+            s.vx *= 0.995;
             s.life -= s.decay;
 
             if (s.life > 0) {
-              // Glow
+              // Soft glow
               ctx.beginPath();
-              ctx.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
+              ctx.arc(s.x, s.y, s.size * 4, 0, Math.PI * 2);
               ctx.fillStyle = s.color;
-              ctx.globalAlpha = s.life * 0.1;
+              ctx.globalAlpha = s.life * 0.06;
               ctx.fill();
               ctx.globalAlpha = 1;
 
@@ -1307,7 +1264,7 @@
               ctx.beginPath();
               ctx.arc(s.x, s.y, s.size * s.life, 0, Math.PI * 2);
               ctx.fillStyle = s.color;
-              ctx.globalAlpha = s.life;
+              ctx.globalAlpha = s.life * 0.9;
               ctx.fill();
               ctx.globalAlpha = 1;
             } else {
@@ -1315,18 +1272,10 @@
             }
           }
 
-          if (!done && launchCount >= maxLaunches && fireworks.length === 0 && sparks.length === 0) {
-            done = true;
-            setTimeout(function () {
-              canvas.style.display = 'none';
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-              finalScreen.classList.add('show');
-            }, 1000);
+          if (sparks.length > 0 && running) {
+            requestAnimationFrame(loop);
           }
-
-          if (!done) requestAnimationFrame(loop);
         }
-
         loop();
       }
     })();
