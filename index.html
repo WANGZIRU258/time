@@ -59,8 +59,8 @@
 
     .converge-item {
       position: absolute;
-      width: 160px; height: 110px;
-      border-radius: 8px; overflow: hidden;
+      width: 190px; height: 130px;
+      border-radius: 10px; overflow: hidden;
       background: rgba(240,232,228,0.85);
       box-shadow: 0 2px 16px rgba(0,0,0,0.06);
       opacity: 0;
@@ -973,29 +973,41 @@
       btn.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
     })();
 
-    // Music
+    // Music - fetch preload for guaranteed instant play
     (function () {
       var vinyl = document.getElementById('vinylPlayer');
-      var audio = new Audio('music.mp3');
-      audio.loop = true;
-      audio.preload = 'auto';
+      var audioBlob = null;
+      var audio = null;
       var playing = false;
 
-      // Preload as soon as page loads
-      audio.load();
+      // Preload: fetch the mp3 as blob, store it
+      fetch('music.mp3').then(function (r) { return r.blob(); }).then(function (blob) {
+        audioBlob = blob;
+      }).catch(function () {});
 
       window.__playMusic = function () {
         if (playing) return;
-        audio.currentTime = 0;
-        audio.play().then(function () {
-          playing = true;
-          vinyl.classList.add('playing');
-        }).catch(function (e) {
-          console.log('Play blocked:', e);
-        });
+        if (audioBlob) {
+          // Already preloaded as blob — instant play
+          audio = new Audio(URL.createObjectURL(audioBlob));
+          audio.loop = true;
+          audio.play().then(function () {
+            playing = true;
+            vinyl.classList.add('playing');
+          }).catch(function () {});
+        } else {
+          // Fallback: try direct
+          audio = new Audio('music.mp3');
+          audio.loop = true;
+          audio.play().then(function () {
+            playing = true;
+            vinyl.classList.add('playing');
+          }).catch(function () {});
+        }
       };
 
       window.__stopMusic = function () {
+        if (!audio) return;
         audio.pause();
         playing = false;
         vinyl.classList.remove('playing');
